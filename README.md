@@ -74,3 +74,4 @@ assessor to use as a guide.
 ## References
 - [AI Apprenticeship Standard](https://www.instituteforapprenticeships.org/media/3685/st0763_artificial-intelligence-ai-data-specialist_l7_ap-for-publication_qm.pdf)
 - [Report Guidelines](https://app.edukate.ai/modules/9516/markdown_page/2421)
+- [LaTeX Document Structure](https://en.wikibooks.org/wiki/LaTeX/Document_Structure)
