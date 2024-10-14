@@ -1,4 +1,4 @@
 report/**/*
-report/**/*.tex
-report/**/*.bib
-report/**/*.pdf
+!report/**/*.tex
+!report/**/*.bib
+!report/**/*.pdf
