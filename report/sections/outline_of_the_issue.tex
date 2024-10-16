@@ -7,18 +7,23 @@
 The BBC produces and stores a vast amount of metadata for its content, and this metadata is surfaced by countless services and APIs.
 One of the priority for the BBC is to increae the adoption across the business of "Passport" \cite{BbcPassportMetadata}, an internal service that generates,
 stores, manages and provides access to a richer dataset of metadata annotations for multi modal content (audio, video and text).
-The usage in production is very low if not existent, and its adoption would make the access to metadata consistent BBC-wide,
+The usage in production is very low, and its adoption would make the access to metadata consistent BBC-wide,
 removing duplications and reducing effort and costs.
 
-Furthermore, the similarity score of the current C2C recommender is directly proportional to the number of values in common between any pairs of items
+The similarity score of the current C2C recommender is directly proportional to the number of values in common between any pairs of items
 on a per-feature basis. But the commonality is calculated with an exact string equality, hence it ignores any relationship between different
-categorical values expressing a similar concept (e.g. "comedy", "stand-up comedy"). The number and types of tags are not enough to sufficiently
-describe the content. The data distribution is severely skewed towards the most popular category and no pre-processing
-is applied. Lastly, each similarity score
-is multiplied by a hardcoded weight that modulates the importance of a feature, but it doesn't solve the polarising effect of a
-skewed distribution. Unfortunately, because they are hyperparameters and not learned weights, the model can't improve
-its performances by minimising them against a cost function.
+categorical values expressing a similar concept (e.g. "comedy", "stand-up comedy").
 
+The number and types of tags are not enough to sufficiently
+describe the content.
+
+The data distribution is severely skewed towards the most popular category and no pre-processing
+is applied.
+
+Lastly, each similarity score is multiplied by a hardcoded weight that modulates the importance of a feature, but it doesn't solve
+the polarising effect of a skewed distribution. Unfortunately, because they are hyperparameters and not learned weights, the model can't improve
+its performances by minimising them against a cost function.
+\\ \\
 To address these issues, the aim of this project was:
 
 \begin{itemize}
@@ -30,7 +35,7 @@ To address these issues, the aim of this project was:
   data from Passport, to build a BBC-wide general solution that could be used by any product and applied to any type of content,
   because they all share the same set of annotations.
   \item \textbf{To build a foundational item-embeddings generator}. Content-based recommenders
-  use information description to work. This project had a twofold outcome: it created an immediate solution for C2C similarity
-  that solely relies on item embeddings; it also created a foundational approach to generate embeddings for personalised recommender
-  that combine user interactions with content metadata.
+  use item metadata. This project provided an immediate solution for C2C unpersonalised recommendations that solely relies on them and
+  it also provided a foundational approach for personalised recommender that combine content metadata with other information like user interactions
+  and contextual data.
 \end{itemize}

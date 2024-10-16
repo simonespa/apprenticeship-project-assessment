@@ -7,9 +7,26 @@
 
 Methods used:
 
-One-Hot Encoding to transform the categorical metadata into a numerical vectors
-Undercomplete autoencoder to compress the sparse array into a lower-dimensional embedding
-Cosine similarity to calculate a similarity score for top-K content similarity
+One-Hot Encoding to transform the categorical features into multiple numerical values.
+It's a simple yet effective method and It's perfect for the transformation of nominal categoricals,
+because it doesn't introduce any ranking and/or additive meaning to the
+encoded values. The downside is that it generates high-dimensional sparse arrays, introducing the
+so called curse of dimensionality problem into the modelling. This is an accepted drawback which is managed
+by the next step of the pipeline.
+
+Undercomplete Autoencoder to compress the high-dimensional sparse array into a lower-dimensional dense space,
+to mitigate the curse of dimensionality. This space is represented by embeddings, which are multi-dimensional vectors in a dense format.
+The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects of the input that improve the model performances
+during training.
+The learned embeddings, also help with the cosine similarity calculation, because one-hot encoded vector pairs have
+either a zero or a right angle, making the cosine respectively 1 or 0. For multi-hot encoded vector pairs (having multiple ones),
+angles can also assume a value in between 0 and 90, which is still limiting in terms of similarity, which we would ideally want on
+a continuous scale, bound between 0 and 1.
+
+
+
+Cosine of angle $$\theta$$ between vector embeddings, to calculate the item similarity.
+
 
 Tools:
 Python as a programming language
