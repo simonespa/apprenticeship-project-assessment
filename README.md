@@ -15,24 +15,24 @@ this total.
 
 The format of the project report should be:
 
-• Introduction and background
-• Outline of the issue or opportunity and the business problem to be solved
-• Methods used & justification
-• The scope of the project (including key performance indicators)
-• Data selection, collection & pre-processing
-• Survey of potential alternatives
-• Implementation - performance metrics
-• Results
-• Discussion & conclusions/recommendations
-• Summary of findings
-• Implications
-• Caveats & limitations
-• Appendices
-  o Code & documentation used for the project e.g. coding developed
-  o Statistical rigour - To include uncertainty/bias/error estimates as appropriate
-  o Figures/tables/visualisation as appropriate to project
-  o Mapping of the project report to the KSB’s mapped to this method
-  o Verification by the apprentice's employer that the project report is a true reflection of
+- Introduction and background
+- Outline of the issue or opportunity and the business problem to be solved
+- Methods used & justification
+- The scope of the project (including key performance indicators)
+- Data selection, collection & pre-processing
+- Survey of potential alternatives
+- Implementation - performance metrics
+- Results
+- Discussion & conclusions/recommendations
+- Summary of findings
+- Implications
+- Caveats & limitations
+- Appendices
+  - Code & documentation used for the project e.g. coding developed
+  - Statistical rigour - To include uncertainty/bias/error estimates as appropriate
+  - Figures/tables/visualisation as appropriate to project
+  - Mapping of the project report to the KSB’s mapped to this method
+  - Verification by the apprentice's employer that the project report is a true reflection of
 the apprentice's involvement, and the report is their own work.
 
 ## Presentation
