@@ -1,0 +1,54 @@
+% Provide high-level overview of the methods (e.g. regression) and tools used
+% with justification explaining why these methods are suitable for the problem at hand.
+% Justification may include factors such as the need for interpretability, transparency
+% or the timescales you had to work with.
+
+\section{Methods \& justification}
+
+I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into multiple numerical values.
+It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
+because it doesn't introduce any ranking and/or arithmetic relationship among the
+encoded values. The downside of this approach is that it generates high-dimensional sparse arrays, introducing the
+so called \textit{curse of dimensionality} problem into the modelling phase. Nonetheless, this was an accepted drawback which was
+managed by the next stage in the pipeline.
+
+I trained a regularised \textbf{undercomplete autoencoder} to reconstruct the data in input.
+The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects that explain the underlying structure.
+The dataset was randomly shuffled and then split in three chunks: training, validation and test.
+The neural network was trained on the training set,
+while the validation set was used for \textbf{hyperparameter tuning}, monitoring the reconstruction loss on this chunk of data
+within a pre-defined "patience" treshold of epochs as a condition for the \textbf{early stopping}.
+The model with the best set of hyperparameters, was validated against
+the test set. Finally, I extracted the \textit{encoder} part from the trained autoencoder, to generate embeddings of unseen metadata
+during inference, compressing the one-hot encoded high-dimensional sparse array into a lower-dimensional dense space,
+which mitigated the curse of dimensionality and the data sparsity.
+
+The item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of vector embeddings. This metric
+is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
+popularity in the similarity calculation. In addition, multi-hot encoded vector pairs can only have a finite number of angles
+(i.e. zero, right angle or something in between) and are bound in the "positive quadrant" of a multi-dimensional Euclidean space.
+This situation forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
+loss for item similarity. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
+is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
+the use of embeddings.
+\\ \\
+The entire project has been written in \textbf{Python}, because it is an established and the \textit{de facto} programming language for data science
+and machine learning tasks, and it is also the language of choice at the BBC, which fosters collaboration and maintenance.
+It also has a diverse and well-documented ecosystem of external libraries and frameworks that facilitate the job.
+
+I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
+to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
+fit in memory, causing Pandas to crash. For this reason I used \textbf{Dask}. It is a library capable of running out-of-memory and
+parallel execution for faster processing on single-node machines, using the familiar Pandas API.
+
+For modelling I used \textbf{TensorFlow} and \textbf{Keras}, to build the encoder-decoder neural network architecture, and \textbf{Keras Tuner} for
+hyperparameters tuning. I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
+the cosine similarity calculation, and I was already familiar with its API.
+
+For data visualisation I used a combination of \textbf{Matplotlib} and \textbf{Seaborn}, while I used \textbf{rdflib} to fetch and parse
+the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label (and other
+relationships between entities).
+This label was needed to hydrate the set of metadata for each item, to visualise the recommendations for testing purposes.
+Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance.
+Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository
+and for collaboration, and \textbf{AWS Sagemaker} to run the pipeline on more capable virtual machines, especially during hyperparameter tuning.
