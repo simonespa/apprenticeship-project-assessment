@@ -1,6 +1,9 @@
 # Apprenticeship Project Assessment
 
-Contains the report and presentation of the work-based project I built during my L7 AI and Data Science apprenticeship.
+Contains the report and presentation of the work-based project I built during my L7 AI and Data Science apprenticeship at the BBC.
+
+I built a machine learning pipeline that generates metadata item embeddings for the calculation of item similarity in the context
+of Content-To-Content similarity recommendations for BBC iPlayer.
 
 ## Report
 
