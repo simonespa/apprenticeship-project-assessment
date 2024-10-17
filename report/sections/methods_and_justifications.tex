@@ -3,49 +3,52 @@
 % Justification may include factors such as the need for interpretability, transparency
 % or the timescales you had to work with.
 
-\section{Methods used \& justification}
+\section{Methods \& justification}
 
-Methods used:
+I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into multiple numerical values.
+It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
+because it doesn't introduce any ranking and/or arithmetic relationship among the
+encoded values. The downside of this approach is that it generates high-dimensional sparse arrays, introducing the
+so called \textit{curse of dimensionality} problem into the modelling phase. Nonetheless, this was an accepted drawback which was
+managed by the next stage in the pipeline.
 
-One-Hot Encoding to transform the categorical features into multiple numerical values.
-It's a simple yet effective method and It's perfect for the transformation of nominal categoricals,
-because it doesn't introduce any ranking and/or additive meaning to the
-encoded values. The downside is that it generates high-dimensional sparse arrays, introducing the
-so called curse of dimensionality problem into the modelling. This is an accepted drawback which is managed
-by the next step of the pipeline.
+I trained a regularised \textbf{undercomplete autoencoder} to reconstruct the data in input.
+The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects that explain the underlying structure.
+The dataset was randomly shuffled and then split in three chunks: training, validation and test.
+The neural network was trained on the training set,
+while the validation set was used for \textbf{hyperparameter tuning}, monitoring the reconstruction loss on this chunk of data
+within a pre-defined "patience" treshold of epochs as a condition for the \textbf{early stopping}.
+The model with the best set of hyperparameters, was validated against
+the test set. Finally, I extracted the \textit{encoder} part from the trained autoencoder, to generate embeddings of unseen metadata
+during inference, compressing the one-hot encoded high-dimensional sparse array into a lower-dimensional dense space,
+which mitigated the curse of dimensionality and the data sparsity.
 
-Undercomplete Autoencoder to compress the high-dimensional sparse array into a lower-dimensional dense space,
-to mitigate the curse of dimensionality. This space is represented by embeddings, which are multi-dimensional vectors in a dense format.
-The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects of the input that improve the model performances
-during training.
-The learned embeddings, also help with the cosine similarity calculation, because one-hot encoded vector pairs have
-either a zero or a right angle, making the cosine respectively 1 or 0. For multi-hot encoded vector pairs (having multiple ones),
-angles can also assume a value in between 0 and 90, which is still limiting in terms of similarity, which we would ideally want on
-a continuous scale, bound between 0 and 1.
+The item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of vector embeddings. This metric
+is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
+popularity in the similarity calculation. In addition, multi-hot encoded vector pairs can only have a finite number of angles
+(i.e. zero, right angle or something in between) and are bound in the "positive quadrant" of a multi-dimensional Euclidean space.
+This situation forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
+loss for item similarity. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
+is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
+the use of embeddings.
+\\ \\
+The entire project has been written in \textbf{Python}, because it is an established and the \textit{de facto} programming language for data science
+and machine learning tasks, and it is also the language of choice at the BBC, which fosters collaboration and maintenance.
+It also has a diverse and well-documented ecosystem of external libraries and frameworks that facilitate the job.
 
+I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
+to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
+fit in memory, causing Pandas to crash. For this reason I used \textbf{Dask}. It is a library capable of running out-of-memory and
+parallel execution for faster processing on single-node machines, using the familiar Pandas API.
 
+For modelling I used \textbf{TensorFlow} and \textbf{Keras}, to build the encoder-decoder neural network architecture, and \textbf{Keras Tuner} for
+hyperparameters tuning. I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
+the cosine similarity calculation, and I was already familiar with its API.
 
-Cosine of angle $$\theta$$ between vector embeddings, to calculate the item similarity.
-
-
-Tools:
-Python as a programming language
-Pandas for dataframe manipulation. Each row of the table corresponds to an item, and each column to an annotation. Multi-hot, because more than one element of the array can have 1.
-Dask for out-of-core and out-of-memory operations. The iPlayer catalogue considered has roughly 1 year worht of data.
-Scikit-learn for dataset splitting and cosine similarity calculation
-TensorFlow and Keras for modelling the Neural Network
-matplotlib and seaborn for visualisation
-rdflib to fetch the RDF entity from the Ontology for visualisation purposes
-
-Justification
-
-
-The data in input is a list of JSON files containing the Passport tags for each item in the iPlayer catalogue. The annotations
-are categorical, so they must be transformed
-This set of tags is extrapolated into a dictionary data structure which is then transformed in a numerical table during a pre-processing phase where the rows represent the programmes and the columns the Passport tags. The numerical vectors are subsequently passed in input to an Autoencoder model, that is trained to reconstruct the input with minimal loss. The encoder part of the learned weights can now be used to generate the embeddings given a set of Passport tags. These embeddings are finally used to calculate the content-to-content similarity between each pair of items, using the cosine as a scoring measure. The result is a matrix of scores that can be used to recommend the top K similar programmes, by filtering the seed programme, sorting the related scores in descending order and returning the top K elements.
-
-A passport tag consists of a predicate/value pair, where the predicate is a string that describes the meaning of the tag (e.g. "about", "narrativeTheme",  etc.) and the value is an RDF entity within the BBC Things Ontology. Each Passport tag has a zero-to-many relationships with the item, so I had to consider the dynamic nature of the input size. Also, the same entity value can appear in conjunction with different predicates for the same item. For example: "contributor:Jeremy Clarkson" and "about:Jeremy Clarkson" are two tags with the same value but with different meaning. So, I had to consider this case in the pre-processing phase, to keep the information intact.
-
-For the pre-processing phase I used One-Hot Encoding. Each programme can be annotated with multiple tags, so it is more like a Multi-Hot encoding, where more than one element can be set to 1. This type of encoding may sound counterintuitive given that for high-cardinality data it generates a high-dimensional vector with all the "curse" that follows. But this is not an issue in this case, because the following step would take care of this.
-
-For the embedding generation, I used an Encoder-Decoder ANN architecture, specifically, an Undercomplete Autoencoder model, built using TensorFlow and Keras. This model can learn latent features and compress the information in a smaller multidimensional vector of condensed numerical values for a more efficient processing. To do so, I extrapolate the Encoder portion of the trained Autoencoder. The input layer of this new model is the same as the Autoencoder, so it is fed with encoded Passport tags and the output layer correspond to the bottleneck layer of the Autoencoder which is how it is able to generate embeddings.
+For data visualisation I used a combination of \textbf{Matplotlib} and \textbf{Seaborn}, while I used \textbf{rdflib} to fetch and parse
+the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label (and other
+relationships between entities).
+This label was needed to hydrate the set of metadata for each item, to visualise the recommendations for testing purposes.
+Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance.
+Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository
+and for collaboration, and \textbf{AWS Sagemaker} to run the pipeline on more capable virtual machines, especially during hyperparameter tuning.
