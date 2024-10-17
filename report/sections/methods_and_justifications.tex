@@ -5,12 +5,12 @@
 
 \section{Methods \& justification}
 
-I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into multiple numerical values.
+I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into a numerical vector.
 It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
 because it doesn't introduce any ranking and/or arithmetic relationship among the
 encoded values. The downside of this approach is that it generates high-dimensional sparse arrays, introducing the
 so called \textit{curse of dimensionality} problem into the modelling phase. Nonetheless, this was an accepted drawback which was
-managed by the next stage in the pipeline.
+managed by the modelling phase of the pipeline.
 
 I trained a regularised \textbf{undercomplete autoencoder} to reconstruct the data in input.
 The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects that explain the underlying structure.
@@ -32,9 +32,9 @@ loss for item similarity. Ideally, we would expect the similarity score to assum
 is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
 the use of embeddings.
 \\ \\
-The entire project has been written in \textbf{Python}, because it is an established and the \textit{de facto} programming language for data science
-and machine learning tasks, and it is also the language of choice at the BBC, which fosters collaboration and maintenance.
-It also has a diverse and well-documented ecosystem of external libraries and frameworks that facilitate the job.
+The entire project was written in \textbf{Python}, because it is the \textit{de facto} programming language for data science
+and machine learning tasks, and it is also the language of choice at the BBC, which fosters collaboration and code maintenance.
+It also has an established, diverse and well-documented ecosystem of external libraries and frameworks that facilitate the job.
 
 I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
 to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
