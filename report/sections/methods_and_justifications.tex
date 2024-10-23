@@ -34,7 +34,7 @@ that minimised the objective function and I used the validation set to regularis
 This technique monitored the reconstruction loss on an out-of-sample dataset,
 allowing the model to stop training within a certain "patience" threshold, after reaching a local minima on the validation error.
 
-I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input, and
+I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
 and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with its
 parent container.
 
@@ -55,7 +55,7 @@ the use of embeddings.
 
 The entire project was written in \textbf{Python}. It is the \textit{de facto} programming language for data science
 and machine learning tasks. Python has an established, diverse and well-documented ecosystem of external libraries
-and frameworks that facilitate the job, and it is also the language of choice at the BBC.
+and frameworks that facilitated the job, and it is also the language of choice at the BBC.
 
 I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
 to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
@@ -70,6 +70,6 @@ For data visualisation I used a combination of \textbf{Matplotlib} and \textbf{S
 the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label (and other
 relationships between entities).
 This label was needed to hydrate the set of metadata for each item, to visualise the recommendations for testing purposes.
-Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance.
+Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance and formatting.
 Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository
 and for collaboration, and \textbf{AWS Sagemaker} to run the pipeline on more capable virtual machines, especially during hyperparameter tuning.
