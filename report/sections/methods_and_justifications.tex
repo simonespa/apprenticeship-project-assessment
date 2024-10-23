@@ -5,43 +5,64 @@
 
 \section{Methods \& justification}
 
+\subsection{Data pre-processing}
+
 I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into a numerical vector.
 It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
 because it doesn't introduce any ranking and/or arithmetic relationship among the
-encoded values. The downside of this approach is that it generates high-dimensional sparse arrays, introducing the
-so called \textit{curse of dimensionality} problem into the modelling phase. Nonetheless, this was an accepted drawback which was
-managed by the modelling phase of the pipeline.
+encoded values. The downside of this approach is that it generates high-dimensional sparse arrays,
+introducing the so called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback which was
+managed in the modelling phase.
 
-I trained a regularised \textbf{undercomplete autoencoder} to reconstruct the data in input.
-The autoencoder is capable of capturing non-linearity in the data, learning latent key aspects that explain the underlying structure.
-The dataset was randomly shuffled and then split in three chunks: training, validation and test.
-The neural network was trained on the training set,
-while the validation set was used for \textbf{hyperparameter tuning}, monitoring the reconstruction loss on this chunk of data
-within a pre-defined "patience" treshold of epochs as a condition for the \textbf{early stopping}.
-The model with the best set of hyperparameters, was validated against
-the test set. Finally, I extracted the \textit{encoder} part from the trained autoencoder, to generate embeddings of unseen metadata
-during inference, compressing the one-hot encoded high-dimensional sparse array into a lower-dimensional dense space,
-which mitigated the curse of dimensionality and the data sparsity.
+\subsection{Modeling and regularisation}
 
-The item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of vector embeddings. This metric
+I trained an undercomplete \textbf{autoencoder} to improve the computational complexity and the quality of the output at inference time.
+Autoencoders are self-supervised models, capable of capturing non-linearity from the data. This type of encoder-decoder limits
+the number of nodes in the hidden layers, and creates a "bottleneck" of information flow through the neural network.
+This bottleneck structure is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
+while reconstructing it with minimal loss. Ultimately, it prevents the model from \textit{overfitting} the training dataset,
+by indexing it like a caching layer.
+
+The \textit{encoder} part of the trained encoder-decoder is used to compress the one-hot encoded high-dimensional sparse vectors into
+so-called \textit{embeddings}, a lower-dimensional dense representation of the initial content metadata.
+This technique solved the curse of dimensionality and the data sparsity problems, and improved the calculation complexity and quality
+during inference.
+
+To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
+it into 3 chunks: training, validation and test. I run \textbf{hyperparameters tuning} to find the best set of model parameters
+that minimised the objective function and I used the validation set to regularise the model with \textbf{early stopping}.
+This technique monitored the reconstruction loss on an out-of-sample dataset,
+allowing the model to stop training within a certain "patience" threshold, after reaching a local minima on the validation error.
+
+I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input, and
+and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with its
+parent container.
+
+\textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.% Batch norm
+
+\subsection{Inference}
+
+Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings. This metric
 is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
 popularity in the similarity calculation. In addition, multi-hot encoded vector pairs can only have a finite number of angles
 (i.e. zero, right angle or something in between) and are bound in the "positive quadrant" of a multi-dimensional Euclidean space.
-This situation forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
-loss for item similarity. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
+This forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
+loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
 is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
 the use of embeddings.
-\\ \\
-The entire project was written in \textbf{Python}, because it is the \textit{de facto} programming language for data science
-and machine learning tasks, and it is also the language of choice at the BBC, which fosters collaboration and code maintenance.
-It also has an established, diverse and well-documented ecosystem of external libraries and frameworks that facilitate the job.
+
+\subsection{Tools and frameworks}
+
+The entire project was written in \textbf{Python}. It is the \textit{de facto} programming language for data science
+and machine learning tasks. Python has an established, diverse and well-documented ecosystem of external libraries
+and frameworks that facilitate the job, and it is also the language of choice at the BBC.
 
 I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
 to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
 fit in memory, causing Pandas to crash. For this reason I used \textbf{Dask}. It is a library capable of running out-of-memory and
-parallel execution for faster processing on single-node machines, using the familiar Pandas API.
+parallel execution for faster processing on single-node machines and distributed computing on multi-nodes machines, while using the familiar Pandas API.
 
-For modelling I used \textbf{TensorFlow} and \textbf{Keras}, to build the encoder-decoder neural network architecture, and \textbf{Keras Tuner} for
+I used \textbf{TensorFlow} and \textbf{Keras} for modelling, to build the encoder-decoder neural network architecture, and \textbf{Keras Tuner} for
 hyperparameters tuning. I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
 the cosine similarity calculation, and I was already familiar with its API.
 
