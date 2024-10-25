@@ -1,0 +1,31 @@
+% Detail what the minimum desirable outcome is and how success will be measured.
+
+\section{Scope of the project and Key Performance Indicators}
+
+The scope for this project was to build an end-to-end machine learning solution able to produce unpersonalised content-to-content
+similarity recommendations, using Passport metadata tags as input. To measure success, I defined a set of key performance indicators (KPIs).
+
+The minimum viable outcome for this solution was to produce a set of recommendations comparable with the ones currently in production and
+as a desired outcome to increase user engagement. The ability to do so using Passport tags and the ability to
+be a general solution applicable to multimodal BBC content were also accounted as KPIs.
+
+Comparability was a qualitative and subjective KPI that served as a compass, indicating whether the project was progressing towards the right direction.
+It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background. I built a rudimentary visualisation
+tool that rendered the title, image, description and metadata of the seed programme and the top-k C2C recommendations.
+People involved could give their subjective feedback on what was their perceived level of similarity of the output,
+testing edge cases and common use cases with expected outcome, sensitive recommendations (i.e. content recommendations for children),
+and discussing whether there were anomalies, expected, unexpected and/or surprising results.
+
+To measure user engagement though, the system needed to be A/B tested in production with real data.
+Unfortunately, there were too many moving parts outside my control that needed to happen first, for me to be able to measure this KPI.
+It would have delayed the project, increasing the chance of failure.
+To mitigate this risk, I defined a hypothesis supported by a KPI that could be measured offline within my area of control, moving the
+testing of this hypothesis outside the scope of the project.
+
+The hypothesis stated that long-term user engagement is impacted by the degree of diversity of recommended content. It went on sayng that
+a diverse set of recommendations can generate new and unexpected results, which can increase surprise and serendipity, pushing the user away from boredom.
+This was an untested hypothesis, but grounded in active research on the topic, such as \cite{Kaminskas2016DiversitySN} and
+\cite{duricic2023beyondaccuracyreviewdiversityserendipity}, that supported the initial statement. Although the hypothesis needed validation,
+it was ok for it to be pushed out of scope, because it wasn't too far fetched afterall.
+For this reason, I defined a proxy metric for diversity that was used to measure an approximation of it offline,
+pending a future A/B test validation.

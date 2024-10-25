@@ -4,9 +4,9 @@
 
 \section{Outline of the issue or opportunity and the business problem to be solved}
 
-The BBC produces and stores a vast amount of metadata for its content, and this metadata is surfaced by countless services and APIs.
-One of the priority for the BBC is to increae the adoption across the business of "Passport" \cite{BbcPassportMetadata}, an internal service that generates,
-stores, manages and provides access to a richer dataset of metadata annotations for multi modal content (audio, video and text).
+The BBC produces and stores a vast amount of data for its content, and this data is produced and surfaced by countless services and APIs.
+One of the priority for the BBC is to increae the usage across the business of "Passport" tags \cite{BBC:PassportMetadata} an internal BBC
+system that provides a richer set of metadata annotations for multi modal content (audio, video and text).
 The usage in production is very low, and its BBC-wide adoption would make the access to metadata consistent,
 removing duplications and reducing effort and costs.
 
@@ -29,9 +29,8 @@ To address these issues, the aim of this project was:
   better describes the content, and by reducing the high-dimensional data to a lower-dimensional latent manifold,
   the model would be able to generate embeddings that could improve the quality of the recommendations, by mapping the
   item similarity problem to a geometric distance calculation between vectors in a multi-dimensional Euclidean space.
-  \item \textbf{To reduce the costs to generate C2C similarity recommendations}. I sourced the input
-  data from Passport, to build a general solution that could be used by any product and applied to any type of content,
-  because they all share the same set of annotations.
+  \item \textbf{To reduce the costs to generate C2C similarity recommendations}. I used Passport tags as input to build a general solution
+  that could be used by any product and applied to any type of content, because they all share the same set of common annotations.
   \item \textbf{To build a foundational item-embeddings generator}. Content-based recommenders
   use item metadata. This project provided an immediate solution for C2C unpersonalised recommendations that solely relies on them and
   it could provide a foundational approach for personalised recommender that combine content metadata with other signals like user interactions

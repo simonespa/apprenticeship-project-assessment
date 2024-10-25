@@ -1,0 +1,77 @@
+% This gives a good opportunity to briefly describe the data architecture of your company
+% You must show you have considered all relevant data protection policies and regulations (both internal company policy and external laws or guidelines).
+% If you use any data external to the company you must reference it.
+% Justify the choice of the data and why it is relevant to the project
+% State what tools you used to efficiently gather the data
+% Outline briefly the data cleansing steps you have taken and the consideration of any source of error and bias
+
+\section{Data selection, collection and pre-processing}
+
+% Data architecture
+
+News and Sports articles, iPlayer videos on-demand, Sounds podcasts etc. are annotated with the so-called Passport tags.
+These tags describe the content produced by the BBC and can be used for retrieval (search) and filtering (recommendations).
+They can be applied either manually by an editorial team with domain knowledge,
+or semi-automatically by machine learning algorithms with human supervision.
+
+Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system,
+a self-service metadata delivery platform that exposes data as a document stream for products to integrate with.
+This platform provides different types of "consumers" such as REST API, AWS S3 bucket, etc.
+Passport documents are JSON objects that contain a property called "taggings", an array of objects representing the
+metadata annotations. These objects in turn contain two properties: "predicate" and "value". They represent the name and the value of
+a tag, and are expressed as URL-formatted strings, with the exception of dates. The predicate is a class of the BBC Ontology \cite{BBC:Ontologies}
+while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
+accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
+These entities are linked to each other and/or to external resources, and are described by attributes and relationships, giving the
+data a graph structure.
+
+% Tools used to gather data
+
+For the development of the project, I decided not to integrate with UCED but to use batches of Passport files, manually collected and stored
+on a local folder.
+This was a tradeoff that allowed me to develop the project with real data while keeping the costs down, given that the resources needed to
+be set on two AWS accounts. Moreover, I didn't want to pass the burden of maintenance to the team that owned the accounts, without having tested
+the feasibility of the solution first.
+
+% Data protection policies and regulation
+
+Content metadata is not classified as personally identifiable information (PII), according to the UK GDPR \cite{UKGDPR}. Nonetheless,
+this data is regulated by internal BBC data governance policies and as such, it is encrypted at rest and in transit by default.
+For this reason, no further precautions were required during storage and processing.
+
+% Data choice justification and relevance
+
+I chose to use Passport because this data provides a set of tags shared across all content produced by the BBC,
+making this a general solution that reduces duplications and ultimately costs. Passport provides a flexible and rich set of tags to describe
+any content. Annotations can describe canonical information such as \textit{genre} and \textit{format}, but also things like the "contributor"
+that features in, the "narrative theme", the "editorial tone", what the content is "about" or what relevant \textit{entities} are mentioned, etc.
+
+% Data preprocessing, errors, bias
+
+During pre-processing, a list of JSON files were loaded into the pipeline and the tags extrapolated into a dictionary data structure.
+The key of the dictionary was the programme ID (called \textit{PID}) and the value was another dictionary describing the annotations.
+A programme can be tagged with the same predicate multiple times,
+as long as it has different values, while the same value (e.g. "Music") can be used by multiple predicates (e.g. "about" or "genre").
+
+The dictionary was transformed in a Pandas \textit{Dataframe}, where the rows represented the programmes and the columns the tags.
+I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because I needed to keep the duplicate values (2nd-level index) across the predicates
+(1st-level index).
+I then populated the cells of the \textit{Dataframe} with the value \verb|"1"| if the programme was annotated with the corresponding tag,
+or \verb|"0"| otherwise.
+This process generated one-hot encoded arrays. I initially started with a vectorisation approach known to be performant,
+using the \verb|"get_dummies"| Pandas function. Surprisingly, it was slower and less scalable of the solution that
+I adopted in the end.
+
+A source of bias in the dataset was the usage of the \verb|"mentions"| tag. This tag is automatically generated by an algorithm that extracts
+terms deemed important, appearing in the text of an article or the transcript of an audio/video content.
+Something "mentioned" doesn't necessarily describe what the content is about, because of the intrinsic ambiguities of natural languages.
+Figure of speech devices such as metaphors, analogies, allegories, etc., alter the meaning of a sentence for stylistic effect and can
+affect the representation of what the content was about. For example, if the idiom "being over the moon" is mentioned referring to
+something unrelated with space, and the term "moon" is extracted as a descriptor, it certainly increases the chances of misrepresentation.
+To mitigate this source of bias I dropped the tag in favour of \verb|"about"|, a tag that describes what the content is really about.
+This tag is manually annotated by editorial teams who are trained to only annotate with relevant and topical entities.
+
+A source of error was the encoding of unseen tags. I decided to drop the new tags and encode the data with the existing ones only.
+Also, a subset of programmes didn't have any annotations. Creating an entry for them would have generated a minority of one-hot encoded arrays
+with all zeros, representing a characteristic class of uninformative observations. I decided to drop these programmes and include the only the ones
+with at least one annotation.
