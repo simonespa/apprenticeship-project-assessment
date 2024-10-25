@@ -35,7 +35,7 @@ This technique monitored the reconstruction loss on an out-of-sample dataset,
 allowing the model to stop training within a certain "patience" threshold, after reaching a local minima on the validation error.
 
 I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
-and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with its
+and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with their
 parent container.
 
 \textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.% Batch norm
@@ -44,8 +44,8 @@ parent container.
 
 Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings. This metric
 is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
-popularity in the similarity calculation. In addition, multi-hot encoded vector pairs can only have a finite number of angles
-(i.e. zero, right angle or something in between) and are bound in the "positive quadrant" of a multi-dimensional Euclidean space.
+popularity in the similarity calculation. In addition, multi-hot encoded pairs can only have a finite number of angles.
+They represent unit vectors bound in the "positive quadrant" of a multi-dimensional Euclidean space.
 This forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
 loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
 is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
@@ -62,13 +62,13 @@ to use it for exploratory data analysis (EDA), because the iPlayer catalogue use
 fit in memory, causing Pandas to crash. For this reason I used \textbf{Dask}. It is a library capable of running out-of-memory and
 parallel execution for faster processing on single-node machines and distributed computing on multi-nodes machines, while using the familiar Pandas API.
 
-I used \textbf{TensorFlow} and \textbf{Keras} for modelling, to build the encoder-decoder neural network architecture, and \textbf{Keras Tuner} for
+I used \textbf{TensorFlow} and \textbf{Keras} for modelling, to build and train the encoder-decoder neural network architecture,
+and \textbf{Keras Tuner} for
 hyperparameters tuning. I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
 the cosine similarity calculation, and I was already familiar with its API.
 
 For data visualisation I used a combination of \textbf{Matplotlib} and \textbf{Seaborn}, while I used \textbf{rdflib} to fetch and parse
-the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label (and other
-relationships between entities).
+the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label.
 This label was needed to hydrate the set of metadata for each item, to visualise the recommendations for testing purposes.
 Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance and formatting.
 Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository

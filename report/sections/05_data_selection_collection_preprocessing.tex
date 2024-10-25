@@ -1,0 +1,76 @@
+% This gives a good opportunity to briefly describe the data architecture of your company
+% You must show you have considered all relevant data protection policies and regulations (both internal company policy and external laws or guidelines).
+% If you use any data external to the company you must reference it.
+% Justify the choice of the data and why it is relevant to the project
+% State what tools you used to efficiently gather the data
+% Outline briefly the data cleansing steps you have taken and the consideration of any source of error and bias
+% Survey of potential alternatives
+% Best practice in any data science problem is to consider a range of appropriate models
+% Detail the alternative models
+% State the pros and cons of each, including the justification for your chosen approach.
+% Critical evaluation of your methods is key
+% Implementation - performance metrics
+% The efficacy of your chosen model will be one of the main factors behind choosing it as your approach and dismissing alternatives.
+% This can be demonstrated by showing a range of performance metrics for the model you have chosen as well as for the alternatives considered
+% Justify your choice of metrics stating why they are appropriate for this particular implementation of machine learning
+% It may be easiest to present these metrics and methods in a tabular format
+
+\subsection{Data selection, collection \& pre-processing}
+
+News articles, iPlayer videos on-demand, etc. are annotated with the so-called Passport tags.
+These tags describe the content, and the annotations are either applied manually
+by an editorial team with domain knowledge, or semi-automatically by machine learning algorithms with human supervision.
+
+Passport tags are distributed via the universal content exposure and delivery (UCED) system,
+a self-service metadata delivery platform that exposes data as a document stream for product to integrate with.
+This platform provides different types of "consumers" such as REST API, AWS S3 bucket, etc.
+Passport documents are JSON objects that contain a property called "taggings", an array of objects representing the
+metadata annotations. These objects in turn contain two properties: "predicate" and "value". They represent the name and the value of
+a tag, and are expressed as URL-formatted strings. The predicate refers to a class of the BBC Ontology \cite{BBC:Ontologies}
+and the value to an entity stored as an RDF document, accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
+
+For the development of the project, I decided not to integrate with UCED but to use batches of Passport files, manually collected and stored
+on a local folder.
+This was a tradeoff that allowed me to develop the project with real data while keeping the costs down, given that the resources needed to
+be set on two AWS accounts. Moreover, I didn't want to pass the burden of maintenance to the team the owned the accounts, without having tested
+the feasibility of the solution first.
+
+Content metadata is not classified as personally identifiable information (PII), according to the UK GDPR \cite{UKGDPR}. Nonetheless,
+this data is regulated by the internal BBC data governance and it is encrypted at rest and in transit. For this reason, no other precaution
+were required during storage and processing.
+
+I chose to use Passport because this data provides a flexible and shared set of tags that can annotate any type of content produced by the BBC,
+making this a general solution that reduces duplications and ultimately costs. Passport provides a rich set of tags to describe
+the content. For example, an iPlayer programme can be described not only in terms of the canonical genre or format. Annotations can describe
+the "contributor" that features in it, the "narrative theme", what this programme is "about" or what relevant "entities" are mentioned in it
+and many more.
+
+% Outline briefly the data cleansing steps you have taken and the consideration of any source of error and bias
+% Survey of potential alternatives
+% Best practice in any data science problem is to consider a range of appropriate models
+% Detail the alternative models
+% State the pros and cons of each, including the justification for your chosen approach.
+% Critical evaluation of your methods is key
+% Implementation - performance metrics
+% The efficacy of your chosen model will be one of the main factors behind choosing it as your approach and dismissing alternatives.
+% This can be demonstrated by showing a range of performance metrics for the model you have chosen as well as for the alternatives considered
+% Justify your choice of metrics stating why they are appropriate for this particular implementation of machine learning
+% It may be easiest to present these metrics and methods in a tabular format
+The tags are entities linked to each other or to external resources and are described by attributes and relationships defined by the BBC Ontology,
+according to the RDF \cite{W3C:RDF,W3C:RDF:Concepts} standard.
+This makes the dataset a graph. I initially considered using a Graph Neural Network to exploits these relationship,
+but this would have inflated the complexity of the project, increasing the risk of not finishing it on time.
+
+During pre-processing, a list of JSON files were loaded into the pipeline and the tags extrapolated into a dictionary data structure, where the key represented
+the programme ID (called PID) and the value an object of predicate/value Passport tags. A programme can be tagged with the same predicate multiple times,
+as long as is done with different values, while the same value (e.g. "Music") can be used by multiple predicates (e.g. "about" or "genre").
+
+The dictionary was transformed in a Pandas Dataframe, where the rows represented the programmes and the columns the tags.
+I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because of the duplicate values across predicates.
+I then populated the cells with "1" if the programme was tagged with the corresponding tag, with "0" otherwise, generating a
+list of multi-hot encoded arrays.
+
+Selection bias was a possibility during the data collection phase. A programme with an empty list of tags could have been due to
+an actual absence of them, or because I missed the while searching for the input batches. To mitigate this, I retrieved a list
+of all available programmes on the iPlayer catalogue during a given timeframe, and searched for the related tags.
+If the file wasn't available, it meant no tags were generated.
