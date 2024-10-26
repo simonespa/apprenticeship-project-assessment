@@ -3,18 +3,23 @@
 \section{Scope of the project and Key Performance Indicators}
 
 The scope for this project was to build an end-to-end machine learning solution able to produce unpersonalised content-to-content
-similarity recommendations, using Passport metadata tags as input. To measure success, I defined a set of key performance indicators (KPIs).
+similarity recommendations, using Passport metadata tags as input.
 
 The minimum viable outcome for this solution was to produce a set of recommendations comparable with the ones currently in production and
-as a desired outcome to increase user engagement. The ability to do so using Passport tags and the ability to
-be a general solution applicable to multimodal BBC content were also accounted as KPIs.
+as a desired outcome to increase user engagement. The ability to do so using Passport tags (resulting in a general solution applicable to multimodal
+BBC content) was also accounted as key performance indicators (KPIs), a boolean success/failure one.
+
+I didn't set a KPI to track the reduction of costs, because I didn't have access to the actual information for each AWS account used for C2C across
+the BBC. And I didn't need to, because if the solution uses Passport tags, it can be adopted to all products.
+If we assume that there are $N$ products that use different solutions and the global cost is $C$, by simply measuring the Passport tags KPI -
+assuming the solution is valid and viable and it gets adopted - the cost would be reduced by a factor of $\frac{C}{N}$.
 
 Comparability was a qualitative and subjective KPI that served as a compass, indicating whether the project was progressing towards the right direction.
 It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background. I built a rudimentary visualisation
-tool that rendered the title, image, description and metadata of the seed programme and the top-k C2C recommendations.
+tool that rendered the title, image, description and metadata of the seed programme and the top-K C2C recommendations.
 People involved could give their subjective feedback on what was their perceived level of similarity of the output,
-testing edge cases and common use cases with expected outcome, sensitive recommendations (i.e. content recommendations for children),
-and discussing whether there were anomalies, expected, unexpected and/or surprising results.
+testing edge cases and common use cases with expected outcome, sensitive recommendations (i.e. content recommendations for children accounts),
+and discussing whether there were anomalies and/or surprising results.
 
 To measure user engagement though, the system needed to be A/B tested in production with real data.
 Unfortunately, there were too many moving parts outside my control that needed to happen first, for me to be able to measure this KPI.

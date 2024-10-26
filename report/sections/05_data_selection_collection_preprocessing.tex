@@ -17,8 +17,8 @@ or semi-automatically by machine learning algorithms with human supervision.
 Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system,
 a self-service metadata delivery platform that exposes data as a document stream for products to integrate with.
 This platform provides different types of "consumers" such as REST API, AWS S3 bucket, etc.
-Passport documents are JSON objects that contain a property called "taggings", an array of objects representing the
-metadata annotations. These objects in turn contain two properties: "predicate" and "value". They represent the name and the value of
+Passport documents are JSON objects that contain a property called \verb|taggings|, an array of objects representing the
+metadata annotations. These objects in turn contain two properties: \verb|predicate| and \verb|value|. They represent the name and the value of
 a tag, and are expressed as URL-formatted strings, with the exception of dates. The predicate is a class of the BBC Ontology \cite{BBC:Ontologies}
 while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
 accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.

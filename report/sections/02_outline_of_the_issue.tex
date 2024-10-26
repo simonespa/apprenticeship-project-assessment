@@ -5,13 +5,13 @@
 \section{Outline of the issue or opportunity and the business problem to be solved}
 
 The BBC produces and stores a vast amount of data for its content, and this data is produced and surfaced by countless services and APIs.
-One of the priority for the BBC is to increae the usage across the business of "Passport" tags \cite{BBC:PassportMetadata} an internal BBC
+One of the priority for the BBC is to increae the usage across the business of \textbf{Passport} \cite{BBC:PassportMetadata} an internal BBC
 system that provides a richer set of metadata annotations for multi modal content (audio, video and text).
 The usage in production is very low, and its BBC-wide adoption would make the access to metadata consistent,
 removing duplications and reducing effort and costs.
 
 Furthermore, the similarity score of the current C2C recommender is directly proportional to the number of values in common between any pairs of items
-on a per-feature basis. But the commonality is calculated with an exact string equality, hence it ignores any relationship between different
+on a per-feature basis. But the commonality is calculated with an exact string equality, ignoring any relationship between different
 categorical values expressing a similar concept (e.g. "comedy", "stand-up comedy").
 
 Moreover, the number and types of tags are not enough to sufficiently
@@ -19,7 +19,7 @@ describe the content, while the data distribution is severely skewed towards the
 is applied.
 
 Lastly, each similarity score is multiplied by a hardcoded weight that modulates the importance of a feature, but it doesn't solve
-the polarising effect of a skewed distribution. Unfortunately, because they are hyperparameters and not learned weights, the model can't improve
+the polarising effect of a skewed distribution. Unfortunately, because these are hyperparameters and not learned weights, the model can't improve
 its performances by minimising them against a cost function.
 \\ \\
 To address these issues, the aim of this project was:
@@ -29,10 +29,10 @@ To address these issues, the aim of this project was:
   better describes the content, and by reducing the high-dimensional data to a lower-dimensional latent manifold,
   the model would be able to generate embeddings that could improve the quality of the recommendations, by mapping the
   item similarity problem to a geometric distance calculation between vectors in a multi-dimensional Euclidean space.
-  \item \textbf{To reduce the costs to generate C2C similarity recommendations}. I used Passport tags as input to build a general solution
-  that could be used by any product and applied to any type of content, because they all share the same set of common annotations.
+  \item \textbf{To build a general solution that can be applied once, reducing the costs}. I used Passport tags as input data to build a general solution
+  that could be used for any BBC product and applied to any type of content, because they all share the same set of common tags.
   \item \textbf{To build a foundational item-embeddings generator}. Content-based recommenders
-  use item metadata. This project provided an immediate solution for C2C unpersonalised recommendations that solely relies on them and
+  use item metadata. This project provided an immediate solution for unpersonalised C2C recommendations that solely relies on them and
   it could provide a foundational approach for personalised recommender that combine content metadata with other signals like user interactions
   and contextual data.
 \end{itemize}

@@ -11,12 +11,12 @@ I used \textbf{one-hot encoding} to transform the categorical features (i.e. the
 It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
 because it doesn't introduce any ranking and/or arithmetic relationship among the
 encoded values. The downside of this approach is that it generates high-dimensional sparse arrays,
-introducing the so called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback which was
+introducing the so called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback that was
 managed in the modelling phase.
 
 \subsection{Modeling and regularisation}
 
-I trained an undercomplete \textbf{autoencoder} to improve the computational complexity and the quality of the output at inference time.
+I trained an undercomplete \textbf{autoencoder} to improve the the quality of the recommendations, and to reduce the cost of calculating them.
 Autoencoders are self-supervised models, capable of capturing non-linearity from the data. This type of encoder-decoder limits
 the number of nodes in the hidden layers, and creates a "bottleneck" of information flow through the neural network.
 This bottleneck structure is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
@@ -25,8 +25,8 @@ by indexing it like a caching layer.
 
 The \textit{encoder} part of the trained encoder-decoder is used to compress the one-hot encoded high-dimensional sparse vectors into
 so-called \textit{embeddings}, a lower-dimensional dense representation of the initial content metadata.
-This technique solved the curse of dimensionality and the data sparsity problems, and improved the calculation complexity and quality
-during inference.
+This technique solved the curse of dimensionality and the data sparsity problems, and improved the calculation complexity and the quality
+of the recommendations at inference time.
 
 To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
 it into 3 chunks: training, validation and test. I run \textbf{hyperparameters tuning} to find the best set of model parameters
