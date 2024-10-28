@@ -1,9 +1,55 @@
 \section{Discussion and conclusions}
 
+% These should be framed as benefits to the business with quantifiable evidence
+% It is likely the results of your project will have been shared at the company,
+% if they were shown in a presentation or perhaps in a dashboard state this. If positive feedback was received, include this also.
+% Reconsider your stakeholders, did the project have the expected outcomes for them?
 \subsection{Results}
 
+This is a general solution that works on any content that uses Passport tags. It could be implemented as a single implementation
+to serve multiple products. This will reduce effort, duplication of code and data, and as a consequence, costs.
+I presented this project explaining the main intuition and showing the results with the visualisation tool.
+Once to the data scientists and engineers of the team I worked with and on a second occasion,
+to the stakeholders of the team that - after an internal restructuring - will be in charge to provide unpersonalised recommendations,
+including C2C similarity. The feedback was positive in both cases. When I presented the project to the last team, it was mentioned
+that we would need to implement this solution so that we can assess end-to-end feasability and put it in a position to be A/B tested
+against the current solution in production.
+
+% State how your results have aligned with your original objectives and measures of success
+% State what recommendations have been made to the business as a result of this project
+% These recommendations may include proposals for further work or alternative research or extensions to the project
+% State whether or not the machine learning approach can be successful in meeting the future requirements of the business.
+% If it has been deployed state considerations such as data drift and retraining that will need to be taken into account
+% It has not been deployed but there is a desire to do so within the business outline and the steps needed to achieve this
 \subsection{Summary of findings and recommendations}
 
+The results are perfectly aligned with the initial objectives and measure of success set at the beginning of the project.
+My recommendation is to build an initial minimum viable product (MVP) pipeline on the AWS development account.
+This will allow us to break down the engineering effort, and to spot any blockers/challenges that need to be addressed
+as early as possible, so that we can correct them and/or reconsider some of the assumptions ahead of the production build.
+We could use the Sagemaker Pipeline to build the stages, and initially test the end-to-end solution with batch Passport data.
+We would need two pipelines, one for training and one for inference, to generate the embeddings and the similarity scores.
+The output could be cached, to improve performances, and if everything goes smoothly from an engineering point of view,
+we could integrate with UCED to fetch realtime data, and prep the solution for A/B testing.
+
+If this solution is viable and passes the A/B test, it could also be used to generate embeddings for
+other personalised recommender that use item metadata in conjunction with user interactions and/or contextual data such as
+day and time of interaction, location, device used, etc.
+
+The project could be further expanded by exploiting the graph nature of the data using graph neural network (GNN), specifically a
+graph autoencoder (GAE) to learn meaningful representation of the graph data, capturing the topological structure and the node content.
+This could improve upon the current autoencoder, that relies on the same data being flattened.
+This effort will require further research and prototyping.
+
+% Outline the repercussions the execution of this project has had for yourself, your colleagues, the stakeholders and the business as a whole.
 \subsection{Implications}
 
+The repercussions of
+
+% State some of the shortcomings of your work either as a result of limitations in the data, the overall model performance or the time available to implement the project.
 \subsection{Caveats and limitations}
+
+Data drift can cause loss of similarity information, requiring a re-training of the model.
+The limitation is when new programmes with new unseen tags are added to the catalogue.
+If we don't re-run the pipeline, the new tags won't be one-hot encoded, which means they will be dropped entirely from the embedding generation.
+
