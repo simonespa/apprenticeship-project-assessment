@@ -16,10 +16,10 @@ or semi-automatically by machine learning algorithms with human supervision.
 
 Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system,
 a self-service metadata delivery platform that exposes data as a document stream for products to integrate with.
-This platform provides different types of "consumers" such as REST API, AWS S3 bucket, etc.
-Passport documents are JSON objects that contain a property called \verb|taggings|, an array of objects representing the
-metadata annotations. These objects in turn contain two properties: \verb|predicate| and \verb|value|. They represent the name and the value of
-a tag, and are expressed as URL-formatted strings, with the exception of dates. The predicate is a class of the BBC Ontology \cite{BBC:Ontologies}
+This platform provides different types of \textit{consumers} such as REST API, AWS S3 bucket, etc.
+Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
+metadata annotations. These objects in turn contain two properties: ``\verb|predicate|'' and ``\verb|value|''. They represent the name and the value of
+a tag, and are expressed as URL-formatted strings, except for dates. The predicate is a class of the BBC Ontology \cite{BBC:Ontologies}
 while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
 accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
 These entities are linked to each other and/or to external resources, and are described by attributes and relationships, giving the
@@ -29,7 +29,7 @@ data a graph structure.
 
 For the development of the project, I decided not to integrate with UCED but to use batches of Passport files, manually collected and stored
 on a local folder.
-This was a tradeoff that allowed me to develop the project with real data while keeping the costs down, given that the resources needed to
+This was a trade-off that allowed me to develop the project with real data while keeping the costs down, given that the resources needed to
 be set on two AWS accounts. Moreover, I didn't want to pass the burden of maintenance to the team that owned the accounts, without having tested
 the feasibility of the solution first.
 
@@ -43,32 +43,33 @@ For this reason, no further precautions were required during storage and process
 
 I chose to use Passport because this data provides a set of tags shared across all content produced by the BBC,
 making this a general solution that reduces duplications and ultimately costs. Passport provides a flexible and rich set of tags to describe
-any content. Annotations can describe canonical information such as \textit{genre} and \textit{format}, but also things like the "contributor"
-that features in, the "narrative theme", the "editorial tone", what the content is "about" or what relevant \textit{entities} are mentioned, etc.
+any content. Annotations can describe canonical information such as \textit{genre} and \textit{format}, but also things like the \textit{contributor}
+featuring in the programme, the \textit{narrative theme}, the \textit{editorial tone}, what the content is \textit{about}
+or what relevant entities are \textit{mentioned}, etc.
 
 % Data preprocessing, errors, bias
 
-During pre-processing, a list of JSON files were loaded into the pipeline and the tags extrapolated into a dictionary data structure.
+During pre-processing, a list of JSON files was loaded into the pipeline and the tags extrapolated into a dictionary data structure.
 The key of the dictionary was the programme ID (called \textit{PID}) and the value was another dictionary describing the annotations.
-A programme can be tagged with the same predicate multiple times,
-as long as it has different values, while the same value (e.g. "Music") can be used by multiple predicates (e.g. "about" or "genre").
+A programme can be tagged with the same predicate multiple times if it has different values,
+while the same value (e.g. ``Music'') can be used by multiple predicates (e.g. \verb|about| or \verb|genre|).
 
 The dictionary was transformed in a Pandas \textit{Dataframe}, where the rows represented the programmes and the columns the tags.
 I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because I needed to keep the duplicate values (2nd-level index) across the predicates
 (1st-level index).
-I then populated the cells of the \textit{Dataframe} with the value \verb|"1"| if the programme was annotated with the corresponding tag,
-or \verb|"0"| otherwise.
+I then populated the cells of the \textit{Dataframe} with the value ``\verb|1|'' if the programme was annotated with the corresponding tag,
+or ``\verb|0|'' otherwise.
 This process generated one-hot encoded arrays. I initially started with a vectorisation approach known to be performant,
-using the \verb|"get_dummies"| Pandas function. Surprisingly, it was slower and less scalable of the solution that
+using the ``\verb|get_dummies|'' Pandas function. Surprisingly, it was slower and less scalable of the solution that
 I adopted in the end.
 
-A source of bias in the dataset was the usage of the \verb|"mentions"| tag. This tag is automatically generated by an algorithm that extracts
+A source of bias in the dataset was the usage of the ``\verb|mentions|'' tag. This tag is automatically generated by an algorithm that extracts
 terms deemed important, appearing in the text of an article or the transcript of an audio/video content.
-Something "mentioned" doesn't necessarily describe what the content is about, because of the intrinsic ambiguities of natural languages.
+If something is ``mentioned'', doesn't necessarily describe what the content is about, because of the intrinsic ambiguities of natural languages.
 Figure of speech devices such as metaphors, analogies, allegories, etc., alter the meaning of a sentence for stylistic effect and can
-affect the representation of what the content was about. For example, if the idiom "being over the moon" is mentioned referring to
-something unrelated with space, and the term "moon" is extracted as a descriptor, it certainly increases the chances of misrepresentation.
-To mitigate this source of bias I dropped the tag in favour of \verb|"about"|, a tag that describes what the content is really about.
+affect the representation of what the content was about. For example, if the phrase "being over the moon" is said referring to someone feeling great about something,
+unrelated to the cosmic space topic, and the term ``moon'' is extracted as a descriptor, it certainly increases the chances of misrepresentation.
+To mitigate this source of bias I dropped the tag in favour of ``\verb|about|'', a tag that describes what the content is really about.
 This tag is manually annotated by editorial teams who are trained to only annotate with relevant and topical entities.
 
 A source of error was the encoding of unseen tags. I decided to drop the new tags and encode the data with the existing ones only.

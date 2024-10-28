@@ -10,9 +10,9 @@ This is a general solution that works on any content that uses Passport tags. It
 to serve multiple products. This will reduce effort, duplication of code and data, and as a consequence, costs.
 I presented this project explaining the main intuition and showing the results with the visualisation tool.
 Once to the data scientists and engineers of the team I worked with and on a second occasion,
-to the stakeholders of the team that - after an internal restructuring - will be in charge to provide unpersonalised recommendations,
+to the stakeholders of the team that - after an internal restructuring - will be in charge to provide non-personalised recommendations,
 including C2C similarity. The feedback was positive in both cases. When I presented the project to the last team, it was mentioned
-that we would need to implement this solution so that we can assess end-to-end feasability and put it in a position to be A/B tested
+that we would need to implement this solution so that we can assess end-to-end feasibility and put it in a position to be A/B tested
 against the current solution in production.
 
 % State how your results have aligned with your original objectives and measures of success
@@ -30,10 +30,10 @@ as early as possible, so that we can correct them and/or reconsider some of the 
 We could use the Sagemaker Pipeline to build the stages, and initially test the end-to-end solution with batch Passport data.
 We would need two pipelines, one for training and one for inference, to generate the embeddings and the similarity scores.
 The output could be cached, to improve performances, and if everything goes smoothly from an engineering point of view,
-we could integrate with UCED to fetch realtime data, and prep the solution for A/B testing.
+we could integrate with UCED to fetch real-time data, and prep the solution for A/B testing.
 
 If this solution is viable and passes the A/B test, it could also be used to generate embeddings for
-other personalised recommender that use item metadata in conjunction with user interactions and/or contextual data such as
+other personalised recommenders that use item metadata in conjunction with user interactions and/or contextual data such as
 day and time of interaction, location, device used, etc.
 
 The project could be further expanded by exploiting the graph nature of the data using graph neural network (GNN), specifically a
@@ -52,4 +52,3 @@ The repercussions of
 Data drift can cause loss of similarity information, requiring a re-training of the model.
 The limitation is when new programmes with new unseen tags are added to the catalogue.
 If we don't re-run the pipeline, the new tags won't be one-hot encoded, which means they will be dropped entirely from the embedding generation.
-

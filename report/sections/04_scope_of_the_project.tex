@@ -2,17 +2,17 @@
 
 \section{Scope of the project and Key Performance Indicators}
 
-The scope for this project was to build an end-to-end machine learning solution able to produce unpersonalised content-to-content
+The scope for this project was to build an end-to-end machine learning solution able to produce non-personalised content-to-content
 similarity recommendations, using Passport metadata tags as input.
 
 The minimum viable outcome for this solution was to produce a set of recommendations comparable with the ones currently in production and
 as a desired outcome to increase user engagement. The ability to do so using Passport tags (resulting in a general solution applicable to multimodal
-BBC content) was also accounted as key performance indicators (KPIs), a boolean success/failure one.
+BBC content) was also accounted as key performance indicators (KPIs), a Boolean success/failure one.
 
 I didn't set a KPI to track the reduction of costs, because I didn't have access to the actual information for each AWS account used for C2C across
 the BBC. And I didn't need to, because if the solution uses Passport tags, it can be adopted to all products.
-If we assume that there are $N$ products that use different solutions and the global cost is $C$, by simply measuring the Passport tags KPI -
-assuming the solution is valid and viable and it gets adopted - the cost would be reduced by a factor of $\frac{C}{N}$.
+If we assume that there are $N$ products that use different solutions, and the global cost is $C$, by simply measuring the Passport tags KPI -
+assuming the solution is valid and viable, and it gets adopted - the cost would be reduced by a factor of $\frac{C}{N}$.
 
 Comparability was a qualitative and subjective KPI that served as a compass, indicating whether the project was progressing towards the right direction.
 It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background. I built a rudimentary visualisation
@@ -27,10 +27,10 @@ It would have delayed the project, increasing the chance of failure.
 To mitigate this risk, I defined a hypothesis supported by a KPI that could be measured offline within my area of control, moving the
 testing of this hypothesis outside the scope of the project.
 
-The hypothesis stated that long-term user engagement is impacted by the degree of diversity of recommended content. It went on sayng that
-a diverse set of recommendations can generate new and unexpected results, which can increase surprise and serendipity, pushing the user away from boredom.
+The hypothesis stated that long-term user engagement is impacted by the degree of diversity of recommended content. It went on saying that
+diverse set of recommendations can generate new and unexpected results, which can increase surprise and serendipity, pushing the user away from boredom.
 This was an untested hypothesis, but grounded in active research on the topic, such as \cite{Kaminskas2016DiversitySN} and
 \cite{duricic2023beyondaccuracyreviewdiversityserendipity}, that supported the initial statement. Although the hypothesis needed validation,
-it was ok for it to be pushed out of scope, because it wasn't too far fetched afterall.
+it was ok for it to be pushed out of scope, because it wasn't too far-fetched after all.
 For this reason, I defined a proxy metric for diversity that was used to measure an approximation of it offline,
 pending a future A/B test validation.

@@ -11,14 +11,14 @@ I used \textbf{one-hot encoding} to transform the categorical features (i.e. the
 It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
 because it doesn't introduce any ranking and/or arithmetic relationship among the
 encoded values. The downside of this approach is that it generates high-dimensional sparse arrays,
-introducing the so called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback that was
+introducing the so-called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback that was
 managed in the modelling phase.
 
-\subsection{Modeling and regularisation}
+\subsection{Modelling and regularisation}
 
-I trained an undercomplete \textbf{autoencoder} to improve the the quality of the recommendations, and to reduce the cost of calculating them.
-Autoencoders are self-supervised models, capable of capturing non-linearity from the data. This type of encoder-decoder limits
-the number of nodes in the hidden layers, and creates a "bottleneck" of information flow through the neural network.
+I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898} to improve the quality of the recommendations.
+Autoencoders are self-supervised models capable of capturing non-linearity from the data. I used the ``undercomplete'' type.
+It constrains the number of nodes in the hidden layers, creating a ``bottleneck'' of information flow through the neural network.
 This bottleneck structure is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
 while reconstructing it with minimal loss. Ultimately, it prevents the model from \textit{overfitting} the training dataset,
 by indexing it like a caching layer.
@@ -29,24 +29,24 @@ This technique solved the curse of dimensionality and the data sparsity problems
 of the recommendations at inference time.
 
 To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
-it into 3 chunks: training, validation and test. I run \textbf{hyperparameters tuning} to find the best set of model parameters
+it into 3 chunks: training, validation and test. I run \textbf{hyperparameter tuning} to find the best set of model parameters
 that minimised the objective function and I used the validation set to regularise the model with \textbf{early stopping}.
 This technique monitored the reconstruction loss on an out-of-sample dataset,
-allowing the model to stop training within a certain "patience" threshold, after reaching a local minima on the validation error.
+allowing the model to stop training within a set ``patience'' threshold, after reaching a local minimum on the validation error.
 
 I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
 and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with their
 parent container.
 
-\textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.% Batch norm
+\textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.
 
 \subsection{Inference}
 
 Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings. This metric
 is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
-popularity in the similarity calculation. In addition, multi-hot encoded pairs can only have a finite number of angles.
-They represent unit vectors bound in the "positive quadrant" of a multi-dimensional Euclidean space.
-This forces the cosine similarity to also assume a finite number of discrete values between 0 and 1, leading to an information
+popularity in the similarity calculation. One-hot encoded vectors lack of meaningful relations between them, in terms of similarity.
+They represent unit vectors bound in the ``positive quadrant'' of a multi-dimensional Euclidean space. Because each pair can only have a finite number of angles,
+the cosine similarity will also assume a finite number of discrete values between 0 and 1, leading to an information
 loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
 is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
 the use of embeddings.
@@ -57,9 +57,9 @@ The entire project was written in \textbf{Python}. It is the \textit{de facto} p
 and machine learning tasks. Python has an established, diverse and well-documented ecosystem of external libraries
 and frameworks that facilitated the job, and it is also the language of choice at the BBC.
 
-I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately it wasn't possible
+I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately, it wasn't possible
 to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
-fit in memory, causing Pandas to crash. For this reason I used \textbf{Dask}. It is a library capable of running out-of-memory and
+fit in memory, causing Pandas to crash. For this reason, I used \textbf{Dask}. It is a library capable of running out-of-memory and
 parallel execution for faster processing on single-node machines and distributed computing on multi-nodes machines, while using the familiar Pandas API.
 
 I used \textbf{TensorFlow} and \textbf{Keras} for modelling, to build and train the encoder-decoder neural network architecture,

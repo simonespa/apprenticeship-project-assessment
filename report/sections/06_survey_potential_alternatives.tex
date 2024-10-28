@@ -5,12 +5,12 @@
 
 \section{Survey of potential alternatives}
 
-Given a numerical vector representing the Passport tags of a programme in input, the model needed to return a list of the top-k programmes,
+Given a numerical vector representing the Passport tags of a programme in input, the model needed to return a list of the top-K programmes,
 sorted in a descending similarity order.
 The geometric interpretation of the similarity between two items, is the distance between the two vectors representing them.
 
-I considered using a Clustering technique to group "similar" items together, so that given an item in input, the model would return
-the ones belonging to the same cluster. I didn't know how many cluster there were in the data, and I didn't need to know.
+I considered using a Clustering technique to group similar items together, so that given an item in input, the model would return
+the ones belonging to the same cluster. I didn't know how many clusters there could be in the data, and I didn't need to.
 I could have used a density-based technique to autodiscover them,
 but even in that case, some of the clusters could have had less than K items in a top-K similarity scenario.
 I could have returned the items belonging to the nearest cluster if needed, but at that point,
@@ -21,7 +21,7 @@ I needed a more granular approach where every item could be compared with anyone
 In geometric terms it meant that I had to calculate the pairwise distance between any two pairs of vectors, so I didn't need to use
 clustering in the first place.
 
-Both clustering and pairwise distance use the concept of gemoterical distance between any two pairs, and this calculation
+Both clustering and pairwise distance use the concept of geometrical distance between any two pairs, and this calculation
 is computationally expensive, and doesn't scale on big datasets, especially if it involves high-dimensional sparse arrays.
 Not only that, the one-hot encoding processing doesn't use any spatial proximity information to transform the categorical features
 into ones and zeros. It's a plain transformation that pivots the unique values of a given variable as features, and sets 1 to the
@@ -30,15 +30,15 @@ similarity, we are out of luck.
 
 From a computational point of view, I needed to handle the curse of dimensionality, by reducing the dimension of the numerical vectors.
 Not only that, the new vectors needed to be in a denser and lower dimensional manifold embedded into the original high-dimensional ambient space,
-for the "local proximity" to have a meaning in terms of similarity.
+for the ``local proximity'' to have a meaning in terms of similarity.
 
-Dimensionality reduction techniques such as Principal Component Analysis (PCA) (which I'm more familiar with), or
-Independent Component Analysis (ICA), Linear Discriminant Analysis (LDA), etc. were next on the list, but there was a problem with them too.
-Their job is to find a linear projection of the data and this is a strong assumption that - more ofthen than not - misses important non-linear
-structures in the data. So, I discarded the idea of using PCA, but not the idea of using dimensionality reduction.
-I just needed a non-linear aproach, so I turned my attantion to manifold learning.
+Dimensionality reduction techniques such as Principal Component Analysis (PCA),
+Independent Component Analysis (ICA) or Linear Discriminant Analysis (LDA), were next on the list, but there was a problem with them too.
+Their job is to find a linear projection of the data, and this is a strong assumption that misses important non-linear
+structures. So, I discarded the idea of using PCA, but not the idea of using dimensionality reduction.
+I just needed a non-linear approach, so I turned my attention to manifold learning.
 
-Before discussing that, I'd like to point out that I also considered changing the pre-processing step to generate a different
+I'd like to point out that I also considered changing the pre-processing step to generate a different
 set of vectors that didn't suffer from the curse of dimensionality.
 
 Hashing is a well-known non-invertible technique that can be used in machine learning for feature reduction.
@@ -46,6 +46,6 @@ The reason why I didn't adopt this technique was because hashing has more hyperp
 Settings like the size of the hash could have impacted the descriptive power of the vector even before starting the embedding learning phase.
 But most importantly, hashing functions introduce the collision problem, were two distinct entities can be mapped to the same index in the target domain.
 Because this is an issue that can't be removed, only mitigated, I tested the latest and strongest algorithm to reduce the likelihood of collisions,
-but the trade-off was too computetionally expensive during training.
+but the trade-off was too computationally expensive during training.
 
-I talked about why I adopted one-hot encoding, let's now talk about my chosen approach for manifold learning, pros and cons and its justification.
+I talked about why I adopted one-hot encoding, let's now talk about the chosen approach for manifold learning, pros and cons and its justification.
