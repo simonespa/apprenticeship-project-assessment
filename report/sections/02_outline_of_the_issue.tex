@@ -5,7 +5,7 @@
 \section{Outline of the issue or opportunity and the business problem to be solved}
 
 The BBC produces and stores a vast amount of data for its content, and this data is produced and surfaced by countless services and APIs.
-One of the priority for the BBC is to increase the usage across the business of \textbf{Passport} \cite{BBC:PassportMetadata} an internal BBC
+One of the priority for the BBC is to increase the usage across the business of \textbf{Passport} \cite{BBC:PassportMetadata}, an internal BBC
 system that provides a richer set of metadata annotations for multi modal content (audio, video and text).
 The usage in production is very low, and its BBC-wide adoption would make the access to metadata consistent,
 removing duplications and reducing effort and costs.
@@ -15,7 +15,7 @@ on a per-feature basis. But the commonality is calculated with an exact string e
 categorical values expressing a similar concept (e.g. ``comedy'' and ``stand-up comedy'').
 
 Moreover, the number and types of tags are not enough to sufficiently
-describe the content, while the data distribution is severely skewed towards the most popular annotations and no pre-processing
+describe the content, while the data distribution is severely skewed towards the most popular annotations, and no pre-processing
 is applied.
 
 Lastly, each similarity score is multiplied by a hardcoded weight that modulates the importance of a feature, but it doesn't solve
@@ -29,10 +29,9 @@ To address these issues, the aim of this project was:
   better describes the content, and by reducing the high-dimensional data to a lower-dimensional latent manifold,
   the model would be able to generate embeddings that could improve the quality of the recommendations, by mapping the
   item similarity problem to a geometric distance calculation between vectors in a multi-dimensional Euclidean space.
-  \item \textbf{To build a general solution that can be applied once, reducing the costs}. I used Passport tags as input data to build a general solution
-  that could be used for any BBC product and applied to any type of content, because they all share the same set of common tags.
+  \item \textbf{To build a general solution that can be applied to multimodal content, reducing the costs}. I built a C2C solution for
+  iPlayer, but I used Passport tags to make it general, so that it could be applied to any BBC content, because they all share the same set of common tags.
   \item \textbf{To build a foundational item-embeddings generator}. Content-based recommenders
-  use item metadata. This project provided an immediate solution for non-personalised C2C recommendations that solely relies on them and
-  it could provide a foundational basis for personalised recommenders that combine content metadata with other signals like user interactions
-  and contextual data.
+  use item metadata. This project provided an immediate solution for non-personalised C2C recommendations that solely relies on them.
+  It also provided a foundational basis for personalised recommenders that could benefit from using content embeddings combined with other data like user interactions.
 \end{itemize}

@@ -16,15 +16,17 @@ managed in the modelling phase.
 
 \subsection{Modelling and regularisation}
 
-I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898} to improve the quality of the recommendations.
-Autoencoders are self-supervised models capable of capturing non-linearity from the data. I used the ``undercomplete'' type.
-It constrains the number of nodes in the hidden layers, creating a ``bottleneck'' of information flow through the neural network.
-This bottleneck structure is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
+I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898}
+to learn latent features of the Passport tags, and to reduce the size of the encoded vectors.
+The autoencoder is a type of encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
+I used the ``undercomplete'' variant, that constrains the number of nodes in the hidden layers, creating a ``bottleneck''
+of information flow through the network.
+This bottleneck is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
 while reconstructing it with minimal loss. Ultimately, it prevents the model from \textit{overfitting} the training dataset,
 by indexing it like a caching layer.
 
-The \textit{encoder} part of the trained encoder-decoder is used to compress the one-hot encoded high-dimensional sparse vectors into
-so-called \textit{embeddings}, a lower-dimensional dense representation of the initial content metadata.
+The trained \textit{encoder} segment of the network, was used to compress the one-hot encoded high-dimensional sparse array into
+a lower-dimensional and denser representation called \textit{embedding} \cite{GoogleForDevelopers:Embeddings}.
 This technique solved the curse of dimensionality and the data sparsity problems, and improved the calculation complexity and the quality
 of the recommendations at inference time.
 
@@ -42,11 +44,12 @@ parent container.
 
 \subsection{Inference}
 
-Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings. This metric
-is insensitive to the magnitude of the vectors, and because popular values tend to have a larger magnitude, it mitigates the impact of
-popularity in the similarity calculation. One-hot encoded vectors lack of meaningful relations between them, in terms of similarity.
-They represent unit vectors bound in the ``positive quadrant'' of a multi-dimensional Euclidean space. Because each pair can only have a finite number of angles,
-the cosine similarity will also assume a finite number of discrete values between 0 and 1, leading to an information
+Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings \cite{GoogleForDevelopers:EmbeddingSimilarity}.
+This metric is insensitive to the magnitude of the vectors, and because high-frequency values tend to have a larger magnitude, it mitigates the impact of
+popularity in the similarity calculation. One-hot encoded vectors lack of meaningful relations between them.
+They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multi-dimensional Euclidean space.
+Because each pair can only have a finite number of angles,
+the cosine similarity will also assume a finite number of discrete values between 0 and 1, causing information
 loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
 is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
 the use of embeddings.
