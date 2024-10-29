@@ -5,22 +5,22 @@
 The scope for this project was to build an end-to-end machine learning solution, able to produce non-personalised content-to-content
 similarity recommendations, using Passport metadata tags as input.
 
-The minimum viable outcome was to produce recommendations comparable with the ones currently in production.
-A desired outcome was to increase user engagement. The integration with Passport would make the solution general,
-and applicable to multimodal BBC content. If adopted, this solution would generate considerable savings.
+The minimum viable outcome was to produce recommendations comparable with the ones currently in production, while a
+desired outcome was to increase user engagement. The integration with Passport would make this solution general,
+and applicable to multimodal BBC content. If adopted by $N$ BBC products with a total cost $C$,
+it could generate considerable savings, with an approximate reduction in costs by a factor of $\frac{C}{N}$.
 
-I didn't have access to the actual cost for each AWS account used for C2C across the BBC, so I couldn't present a number to demonstrate the reduction.
-But, if this solution is adopted by $N$ products for example, the final cost would be divided by a factor of $N$, which is a considerable improvement.
-
-Comparability was a qualitative and subjective key performance indicator (KPI) that served as a compass, indicating whether the project was progressing towards the right direction.
-It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background. I built a rudimentary visualisation
-tool that rendered the title, image, description and metadata of the seed programme and the top-K C2C recommendations.
-The people involved, could give their subjective feedback on what was their perceived level of similarity of the output,
-testing edge cases and common use cases with an expected outcome, sensitive recommendations (e.g. content recommendations for children accounts),
-and discussing anomalies and/or surprising results.
+Comparability was a qualitative and subjective key performance indicator (KPI) that served as a compass,
+indicating whether the project was progressing towards the right direction.
+It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background.
+I built a rudimentary visualisation tool that rendered the title, image, description and metadata of the seed programme
+and the top-K C2C recommendations.
+The people involved, gave their subjective feedback on their perceived level of similarity of the output,
+testing edge cases, common use cases with an expected outcome and sensitive recommendations like content recommendations for children accounts.
+They also discussed anomalies and/or surprising results.
 
 To measure user engagement though, the solution needed to be A/B tested in production, with real data.
-Unfortunately, there were too many moving parts outside my control that needed to happen, for me to even try and build a production-worthy version for A/B testing.
+Unfortunately, there were too many moving parts outside my control that needed to happen, for me to build a production-worthy version for A/B testing.
 Adopting this as a KPI would have delayed the project, increasing the odds of failure.
 To mitigate this risk, I had to decouple it from the success of the project.
 

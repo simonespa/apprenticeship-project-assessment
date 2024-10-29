@@ -22,7 +22,7 @@ The autoencoder is a type of encoder-decoder neural network, a self-supervised m
 I used the ``undercomplete'' variant, that constrains the number of nodes in the hidden layers, creating a ``bottleneck''
 of information flow through the network.
 This bottleneck is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
-while reconstructing it with minimal loss. Ultimately, it prevents the model from \textit{overfitting} the training dataset,
+while reconstructing it with minimal loss. Ultimately, it helps preventing the model from \textit{overfitting} the training dataset,
 by indexing it like a caching layer.
 
 The trained \textit{encoder} segment of the network, was used to compress the one-hot encoded high-dimensional sparse array into
@@ -31,23 +31,22 @@ This technique solved the curse of dimensionality and the data sparsity problems
 of the recommendations at inference time.
 
 To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
-it into 3 chunks: training, validation and test. I run \textbf{hyperparameter tuning} to find the best set of model parameters
-that minimised the objective function and I used the validation set to regularise the model with \textbf{early stopping}.
+it into 3 chunks: training, validation and test. I used the validation set for \textbf{hyperparameter tuning},
+to find the best set of model parameters that minimised the cost function. Also to regularise the model with \textbf{early stopping}.
 This technique monitored the reconstruction loss on an out-of-sample dataset,
 allowing the model to stop training within a set ``patience'' threshold, after reaching a local minimum on the validation error.
+The test set was finally used to assess the performances of the model using the best set of parameters.
 
 I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
-and \textbf{data augmentation}, by including in the training data the episodes of a programme that share the same tags with their
-parent container.
-
-\textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.
+and \textbf{data augmentation}, by including in the training data the episodes that shared the same tags with their
+parent programme. \textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.
 
 \subsection{Inference}
 
 Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings \cite{GoogleForDevelopers:EmbeddingSimilarity}.
 This metric is insensitive to the magnitude of the vectors, and because high-frequency values tend to have a larger magnitude, it mitigates the impact of
 popularity in the similarity calculation. One-hot encoded vectors lack of meaningful relations between them.
-They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multi-dimensional Euclidean space.
+They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multidimensional Euclidean space.
 Because each pair can only have a finite number of angles,
 the cosine similarity will also assume a finite number of discrete values between 0 and 1, causing information
 loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this

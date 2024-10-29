@@ -14,16 +14,17 @@ had the same dimensions: 8982 nodes. This number corresponded to the size of the
 
 Some of the hyperparameters were decided based on the nature of the problem. The input data was a tensor of zeros and ones,
 and the main objective of the network was to reconstruct the output with minimal loss.
-To achieve this, I used the \textit{Sigmoid} as activation function for the output layer, and \textit{binary cross-entropy} as loss function,
-to allow the network to push the reconstructed output values as close as possible to 0 and 1.
-I didn't use the \textit{SoftMax} activation function for the output layer, because each single node needed to be able to assume a value between 0 and 1.
-I didn't use any residual-based loss function such as MSE or MAE, because the sum of the square (or absolute value) of the residuals for 0/1 values
-doesn't have a very steep slope to allow the gradient to move fast enough. Which is why the negative log loss in cross entropy is the best choice,
-because it massively penalises huge differences between $\hat{y}$ and $y$ with a logarithmic progression.
-
-Some other hyperparameters were set after few rounds of training. For example, I used the \textit{Rectified Linear Unit (ReLU)} as activation function
-for the hidden layers. I also tested other variants like \textit{Leaky ReLU (LReLU)} and \textit{Parametric ReLU (PReLU)}
-with some isolated hyperparameters tuning tests, but without any relevant improvements in performance. These hyperparameters were:
+I used the \textit{Sigmoid} activation function for the output layer, and \textit{binary cross-entropy} as loss function,
+to allow the network to push the values of the reconstructed output as close as possible to 0 and 1.
+I didn't use the \textit{SoftMax} activation function for the output layer, because each single node needed to be able
+to assume those values.
+I didn't use any residual-based loss function either - such as MSE or MAE - because they don't have a very steep slope
+for 0/1 values, to allow the gradient to move fast enough.
+Which is why the negative log loss was the best choice, because it massively penalises huge differences between $y$ and  $\hat{y}$,
+with a natural logarithmic progression.
+I used the \textit{Rectified Linear Unit (ReLU)} as activation function
+for the hidden layers, while testing other variants like \textit{Leaky ReLU (LReLU)} and \textit{Parametric ReLU (PReLU)},
+but without any relevant improvements in performance. Some other hyperparameters were:
 
 \begin{itemize}
   \item the optimizer: Adam
@@ -49,39 +50,30 @@ The hyperparameters considered by Hyperband were:
   \item whether to use batch normalisation
 \end{itemize}
 
-The number of hidden layers was a positive integer $N > 0$ where $N-1$ layers were used for the encoder and the same amount for
-the decoder - because the autoencoder has a symmetrical structure - and one layer was instead used for the bottleneck in the middle.
+The number of hidden layers was a positive integer $N > 0$, where $N-1$ layers were used for the encoder and the
+the decoder (because the autoencoder has a symmetrical architecture), and one for the bottleneck in the middle.
 If the hyperparameters was set to $1$, the network would only have the bottleneck.
 
-The number of nodes per layer was also a positive integer $N$. Unfortunately, the number of combinations was too big to be
-meaningfully optimised. To reduce the complexity, I decided to couple the number of nodes per layer as a progression of integer divisions by 2.
-Each layer in the encoder had half the number of nodes compared to the previous one and double the amount of the successive one
+The number of nodes per layer was also a positive integer $N$. Unfortunately, the number of combinations was too high to be
+meaningfully optimised. To reduce the complexity, I decided to couple the number of nodes per layer as a progression
+of integer divisions by 2.
+Each layer in the encoder had half the number of nodes compared to the previous one, and double the amount of the successive one
 (and \textit{vice versa} in the decoder). For example, because I had 8982 nodes in input, the progression of layer dimensions
 was: 4491, 2245, 1122, 561, 280, 140 and so on. Therefore, the embedding size was also bound to assume one of these values,
 greatly reducing the number of choices, hence the runtime of the hyperparameter optimisation.
 
-The strengths of this approach were the efficient use of space and the fast inference time. Training took longer during hyperparameter tuning.
-This drawback was compensated by the fact that I adopted an offline training approach,
-together with a ``stale-while-revalidate'' policy to return the recommendations at inference time, in addition to the similarity scores being cached.
-The space scaled linearly with respect to the size of the input to store the embeddings, and quadratically to store the similarity scores.
-The drawback was the model's interpretability, or in this case, the lack thereof. The autoencoder is a \textit{black box} by definition and the
-use of embeddings to calculate the similarity just made the problem worse. It is difficult if not impossible to interpret which of the tags influenced
-the ranking in the top-K list by untangling the weights and biases of the neural network. But it's also difficult to explain what is going on,
-even using model-agnostic techniques like SHAP. The autoencoder's output is the reconstruction of the input, but the actual output of the entire model
-are the cosines of each pairs of vector embeddings. So, no explainability either, or at least, localised to the neural network.
-
-To mitigate this problem, I considered "the model" being the entirety of the pipeline. Given a programme in input which is annotated with a set of tags,
-I get in output a list of the top-K most similar programmes, which are also annotated with a set of tags. This meant that I could analyse the tags
-and use their frequency and composition as proxy metrics for feature importance. I could calculate the intersection between the input tags and the
-recommended ones, giving a measure of coverage that can approximate the strength of the annotations of the input programme, conditioning the recommendations.
-I could also calculate the difference between the recommended tags minus the one in input, to calculate the distribution of the new tags introduced by
-the recommended programmes, to approximate diversity.
-
-
-
-
-
-
-
-
-For this reason, and because the Sigmoid function can lead to loss saturation (i.e. the function plateau at the +/- infinity) that could prevent gradient-based learning algorithms from making progress, I'm using Binary Cross Entropy as a loss function. Binary Cross Entropy not only helps pushing the values closer to 0 or to 1 depending on the input value (to minimise the reconstruction loss), but also counteracts the effects of the exponential in the Sigmoid with the use of the log.
+The strength of this approach is the efficient use of space, and the fast inference time.
+The space scales linearly with respect to the size of the input to store the embeddings,
+and quadratically to store the similarity scores.
+Hyperparameter tuning takes quite some time, but this drawback is compensated by the fact that training is performed offline,
+while the recommendations are cached and served instantly. In addition, re-training can be scheduled to cover for the new
+programmes added to the iPlayer catalogue, and the unavailable ones being removed.
+The main weakness is the model's interpretability, or in this case, the lack thereof.
+The autoencoder is a \textit{black box} by definition, and the
+use of embeddings to calculate the similarity just makes the problem worse.
+It is practically impossible to interpret which of the tags influenced
+the ranking in the top-K list, by untangling the weights and biases of the neural network.
+But it's also difficult to provide explanations using model-agnostic techniques like SHAP,
+because the recommendations are calculated by some distance metric applied on
+humanly meaningless embeddings, that need to be linked to the original input, that in turn needs to be
+decoded back to the original tags.
