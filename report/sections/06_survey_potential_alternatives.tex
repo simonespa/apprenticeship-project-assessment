@@ -14,14 +14,15 @@ I could have returned the items belonging to the nearest cluster if needed, but 
 clustering wasn't very useful in this use case.
 
 The geometric interpretation of similarity between two items, is the distance in space between the two vectors representing them.
-In content similarity, any item has a degree of similarity with all the others, and clustering was just a coarse-grained discretisation of that concept.
+Any item has a degree of similarity with all the others, and clustering was just a coarse-grained discretisation of that concept.
 I needed a more granular approach, where every item could be compared with anyone else.
-In geometric terms, I had to calculate the \textbf{pairwise distance} between all vectors given a metric, so clustering was discarded.
+In geometric terms, I had to calculate the \textbf{pairwise distance} between all vectors, given a metric.
+So, clustering was discarded as a candidate option.
 
 One-hot encoding doesn't use any spatial proximity information to transform the categorical features into ones and zeros.
 It's a transformation process that pivots the unique values of each original feature, to be the new variables of the transformed vector.
-If we project these raw vectors in a multi-dimensional coordinate system, we wouldn't be able to use their
-relative position to each other as a measure of similarity. Moreover, the high-dimensionality of the vectors would have increased
+If we project these raw vectors in a multidimensional space, we wouldn't be able to use their
+relative position to each other as a measure of similarity. Moreover, the high dimensionality of the vectors would have increased
 the computational complexity
 
 To calculate the pairwise distance efficiently, and to produce a meaningful representation of similarity, the vectors
@@ -32,10 +33,10 @@ Dimensionality reduction techniques such as \textbf{principal component analysis
 \textbf{independent component analysis (ICA)} or \textbf{linear discriminant analysis (LDA)} were considered,
 but there was a problem with them too.
 Their job is to find a linear projection of the data, but this is a strong assumption that misses important non-linear
-structures. So, I discarded the idea of using PCA (which I was more familiar with) but not the idea of using dimensionality
-reduction. I just needed a non-linear approach. So, I turned my attention to manifold learning.
+structures. I discarded the idea of using PCA (which I was more familiar with) but not the idea entirely of using dimensionality
+reduction. I just needed a non-linear approach, and I turned my attention to manifold learning.
 
-Before introducing the chosen approach for manifold learning, and discussing the pros and cons in the next section,
+Before introducing the chosen approach in the next section, and discussing the pros and cons,
 I'd like to describe the alternative pre-processing step I also considered,
 to generate vectors that didn't suffer from the curse of dimensionality to begin with.
 
@@ -44,5 +45,5 @@ It can generate smaller vectors than one-hot encoding, but I didn't adopt it
 because hashing has more hyperparameters, which increases its complexity.
 Most importantly, it introduces the \textit{collision} problem,
 were two distinct inputs can be mapped to the same index in the same target domain.
-This issue can be mitigated by choosing the latest and strongest algorithm to reduce the likelihood of collisions,
+This issue could be mitigated by choosing the latest and strongest algorithm to reduce the likelihood of collisions,
 but the trade-off was too computationally expensive for pre-processing.

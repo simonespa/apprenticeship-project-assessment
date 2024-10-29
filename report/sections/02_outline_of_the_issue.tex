@@ -6,8 +6,8 @@
 
 The BBC produces and stores a vast amount of data for its content, and this data is produced and surfaced by countless services and APIs.
 One of the priority for the BBC is to increase the usage across the business of \textbf{Passport} \cite{BBC:PassportMetadata}, an internal BBC
-system that provides a richer set of metadata annotations for multi modal content (audio, video and text).
-The usage in production is very low, and its BBC-wide adoption would make the access to metadata consistent,
+system that provides a richer set of metadata annotations for multimodal content (audio, video and text).
+The usage in production is low, and its BBC-wide adoption would make the access to metadata consistent,
 removing duplications and reducing effort and costs.
 
 Furthermore, the similarity score of the current C2C recommender is directly proportional to the number of values in common between any pairs of items
@@ -25,12 +25,12 @@ its performances by minimising them against a cost function.
 To address these issues, the aim of this project was:
 
 \begin{itemize}
-  \item \textbf{To improve the quality of the C2C similarity recommendations}. The hypothesis was that by using in input a richer set of metadata that
+  \item \textbf{To improve the quality of the C2C similarity recommendations}. By using in input a richer set of metadata that
   better describes the content, and by reducing the high-dimensional data to a lower-dimensional latent manifold,
   the model would be able to generate embeddings that could improve the quality of the recommendations, by mapping the
-  item similarity problem to a geometric distance calculation between vectors in a multi-dimensional Euclidean space.
-  \item \textbf{To build a general solution that can be applied to multimodal content, reducing the costs}. I built a C2C solution for
-  iPlayer, but I used Passport tags to make it general, so that it could be applied to any BBC content, because they all share the same set of common tags.
+  item similarity problem to a geometric distance calculation between vectors in a multidimensional Euclidean space.
+  \item \textbf{To build a general solution that can be applied to multimodal content, reducing the costs}. I built a C2C
+  recommender for iPlayer, and I used the Passport dataset to make the solution general, so that it could be applied to any BBC content, because they all share the same set of common tags.
   \item \textbf{To build a foundational item-embeddings generator}. Content-based recommenders
   use item metadata. This project provided an immediate solution for non-personalised C2C recommendations that solely relies on them.
   It also provided a foundational basis for personalised recommenders that could benefit from using content embeddings combined with other data like user interactions.
