@@ -5,7 +5,7 @@
 
 \section{Implementation and performance metrics}
 
-I used an undercomplete autoencoder to compress the high-dimensional one-hot encoded vectors to a lower dimensional embedding representation.
+I used an undercomplete autoencoder to compress the high dimensional one-hot encoded vectors to a lower dimensional embedding representation.
 This technique captured non-linearity by learning the underlying latent structure of the data, which was key to represent the original
 Passport tags in a geometrical space, exploiting local proximity as a measure of similarity.
 
@@ -50,30 +50,35 @@ The hyperparameters considered by Hyperband were:
   \item whether to use batch normalisation
 \end{itemize}
 
-The number of hidden layers was a positive integer $N > 0$, where $N-1$ layers were used for the encoder and the
-the decoder (because the autoencoder has a symmetrical architecture), and one for the bottleneck in the middle.
-If the hyperparameters was set to $1$, the network would only have the bottleneck.
+The number of hidden layers was a positive odd integer $N > 0$, where $N-1$ layers were used for the encoder and the
+the decoder, and one for the bottleneck in the middle.
+If the value was $1$, the network would only have the bottleneck.
 
-The number of nodes per layer was also a positive integer $N$. Unfortunately, the number of combinations was too high to be
+The number of nodes per layer was a positive integer $N > 0$. Unfortunately, the number of combinations was too high to be
 meaningfully optimised. To reduce the complexity, I decided to couple the number of nodes per layer as a progression
 of integer divisions by 2.
-Each layer in the encoder had half the number of nodes compared to the previous one, and double the amount of the successive one
-(and \textit{vice versa} in the decoder). For example, because I had 8982 nodes in input, the progression of layer dimensions
-was: 4491, 2245, 1122, 561, 280, 140 and so on. Therefore, the embedding size was also bound to assume one of these values,
-greatly reducing the number of choices, hence the runtime of the hyperparameter optimisation.
+Each hidden layer in the encoder had half the number of nodes compared to the previous one, and double the amount of the successive one
+(and \textit{vice versa} in the decoder), except for the layers close to the input and output. In that case, they could assume any
+of the set values, depending on the number of hidden layers and embeddings size. For example, because I had 8982 nodes in input, the progression of layer dimensions
+was: 4491, 2245, 1122, 561, 280, 140 and so on. The embedding size was also bound to assume one of these values, and would also impact
+the maximum number of hidden layers allowed.
+Therefore, a network with 5 hidden layers and an embedding size of \verb|280|
+would have had the following configuration: \verb|8982 -> 1122 -> 561 -> 280 -> 561 -> 1122 -> 8982|. While a network with
+3 hidden layers but an embedding size of \verb|2245| would have had the following configuration:
+\verb|8982 -> 4491 -> 2245 -> 4491 -> 8982|, representing the maximum extension of the progression.
 
-The strength of this approach is the efficient use of space, and the fast inference time.
-The space scales linearly with respect to the size of the input to store the embeddings,
+The strength of this approach was the efficient use of space, and the fast inference time.
+The space scaled linearly with respect to the size of the input to store the embeddings,
 and quadratically to store the similarity scores.
-Hyperparameter tuning takes quite some time, but this drawback is compensated by the fact that training is performed offline,
-while the recommendations are cached and served instantly. In addition, re-training can be scheduled to cover for the new
+Hyperparameter tuning took quite some time, but this drawback was compensated by the fact that training was performed offline,
+while the recommendations were cached and served instantly. In addition, re-training could be scheduled to cover for the new
 programmes added to the iPlayer catalogue, and the unavailable ones being removed.
-The main weakness is the model's interpretability, or in this case, the lack thereof.
+The main weakness was the model's interpretability.
 The autoencoder is a \textit{black box} by definition, and the
-use of embeddings to calculate the similarity just makes the problem worse.
-It is practically impossible to interpret which of the tags influenced
+use of embeddings to calculate the similarity just made the problem worse.
+It was practically impossible to interpret which of the tags influenced
 the ranking in the top-K list, by untangling the weights and biases of the neural network.
-But it's also difficult to provide explanations using model-agnostic techniques like SHAP,
-because the recommendations are calculated by some distance metric applied on
-humanly meaningless embeddings, that need to be linked to the original input, that in turn needs to be
+It was also difficult to provide explanations using model-agnostic techniques like SHAP,
+because the recommendations were calculated by some distance metric, applied on
+humanly meaningless embeddings, that needed to be linked to the original input, that in turn needed to be
 decoded back to the original tags.
