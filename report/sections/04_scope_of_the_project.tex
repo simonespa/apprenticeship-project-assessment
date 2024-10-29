@@ -2,32 +2,33 @@
 
 \section{Scope of the project and Key Performance Indicators}
 
-The scope for this project was to build an end-to-end machine learning solution, able to produce non-personalised content-to-content
-similarity recommendations, using Passport metadata tags as input.
+The scope of this project was to build an end-to-end machine learning solution that could produce non-personalised
+content-to-content similarity recommendations using Passport metadata tags as input.
 
-The minimum viable outcome was to produce recommendations comparable with the ones currently in production, while a
-desired outcome was to increase user engagement. The integration with Passport would make this solution general,
-and applicable to multimodal BBC content. If adopted by $N$ BBC products with a total cost $C$,
-it could generate considerable savings, with an approximate reduction in costs by a factor of $\frac{C}{N}$.
+The minimum viable outcome was to produce recommendations comparable to those currently in production,
+while the desired outcome was to increase user engagement.
+The integration with Passport would make this solution general and applicable to multimodal BBC content.
+If adopted by $N$ BBC products with a total cost of $C$,
+it could generate considerable savings, with an approximate cost reduction by a factor of $\frac{C}{N}$.
 
 Comparability was a qualitative and subjective key performance indicator (KPI) that served as a compass,
 indicating whether the project was progressing towards the right direction.
-It was evaluated by several technical and non-technical stakeholders, with a diverse domain knowledge and background.
-I built a rudimentary visualisation tool that rendered the title, image, description and metadata of the seed programme
-and the top-K C2C recommendations.
-The people involved, gave their subjective feedback on their perceived level of similarity of the output,
-testing edge cases, common use cases with an expected outcome and sensitive recommendations like content recommendations for children accounts.
-They also discussed anomalies and/or surprising results.
+Several technical and non-technical stakeholders with diverse domain knowledge and background evaluated it.
+I built a rudimentary visualisation tool that rendered the programme's title, image, description and Passport tags,
+comparing the seed programmes with the top-K recommendations.
+The people involved gave their subjective feedback on their perceived level of similarity of the output,
+testing edge cases and sensitive recommendations like content recommendations for children's accounts.
+They also discussed anomalies and unexpected results.
 
-To measure user engagement though, the solution needed to be A/B tested in production, with real data.
-Unfortunately, there were too many moving parts outside my control that needed to happen, for me to build a production-worthy version for A/B testing.
+The solution needed to be A/B tested in production, with live data, to measure user engagement.
+Unfortunately, too many moving parts outside my control were required to happen for me to build a
+production-worthy version to achieve that.
 Adopting this as a KPI would have delayed the project, increasing the odds of failure.
-To mitigate this risk, I had to decouple it from the success of the project.
+To mitigate this risk, I had to decouple it from the project's success.
 
-I defined a hypothesis testable offline, within my area of control.
+I defined a hypothesis that could be tested offline and within my control.
 The hypothesis stated that long-term user engagement is not just about accuracy. It can be affected by increasing diversity in the recommended content.
-A diverse set of recommendations generates new and unexpected results, with an increase in surprise and serendipity, pushing the user away from boredom.
-This was an untested hypothesis, but grounded in active research on the topic, such as \cite{Kaminskas2016DiversitySN} and
-\cite{duricic2023beyondaccuracyreviewdiversityserendipity}, that supported the initial statement, and made it less far-fetched.
-For this reason, I defined a proxy metric that could measure diversity offline, pending a future A/B testing for the validation of the hypothesis,
-which was pushed out of scope.
+A diverse set of recommendations generates new and unexpected results, increasing surprise and serendipity, pushing the user away from boredom.
+This theory was untested but grounded in active research on the topic, such as \cite{Kaminskas2016DiversitySN} and
+\cite{duricic2023beyondaccuracyreviewdiversityserendipity}, which made it less far-fetched.
+For this reason, I defined a proxy metric that could measure diversity offline, pending future A/B testing to validate the hypothesis.
