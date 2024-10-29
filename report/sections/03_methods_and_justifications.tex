@@ -8,49 +8,49 @@
 \subsection{Data pre-processing}
 
 I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into a numerical vector.
-It's a simple yet effective encoding method and it's perfect for the transformation of nominal categoricals,
-because it doesn't introduce any ranking and/or arithmetic relationship among the
-encoded values. The downside of this approach is that it generates high-dimensional sparse arrays,
+It is a simple yet effective encoding method and is perfect for transforming nominal categoricals because it doesn’t introduce
+any ranking or arithmetic relationship among the encoded values.
+The downside of this approach is that it generates high-dimensional sparse arrays,
 introducing the so-called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback that was
 managed in the modelling phase.
 
 \subsection{Modelling and regularisation}
 
 I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898}
-to learn latent features of the Passport tags, and to reduce the size of the encoded vectors.
-The autoencoder is a type of encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
-I used the ``undercomplete'' variant, that constrains the number of nodes in the hidden layers, creating a ``bottleneck''
+to learn the Passport tags' latent features and reduce the encoded vectors' size.
+The autoencoder is an encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
+I used the ``undercomplete'' variant, which constrains the number of nodes in the hidden layers, creating a ``bottleneck''
 of information flow through the network.
-This bottleneck is a form of \textit{regularisation} that forces the model to learn latent attributes from the input,
-while reconstructing it with minimal loss. Ultimately, it helps preventing the model from \textit{overfitting} the training dataset,
-by indexing it like a caching layer.
+This bottleneck is a form of \textit{regularisation} that forces the model to learn latent attributes from the input
+while reconstructing it with minimal loss. Ultimately, it helps prevent the model from overfitting the training dataset by indexing it like a caching layer.
 
-The trained \textit{encoder} segment of the network, was used to compress the one-hot encoded high-dimensional sparse array into
+I extracted the trained \textit{encoder} segment of the network to compress the one-hot encoded high-dimensional sparse array into
 a lower-dimensional and denser representation called \textit{embedding} \cite{GoogleForDevelopers:Embeddings}.
-This technique solved the curse of dimensionality and the data sparsity problems, and improved the calculation complexity and the quality
-of the recommendations at inference time.
+This technique solved the curse of dimensionality and the data sparsity problems and improved the calculation
+complexity and the quality of the recommendations at inference time.
 
 To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
-it into 3 chunks: training, validation and test. I used the validation set for \textbf{hyperparameter tuning},
-to find the best set of model parameters that minimised the cost function. Also to regularise the model with \textbf{early stopping}.
+it into three chunks: training, validation and test. I used \textbf{hyperparameter tuning} to find the best model parameters
+that minimised the cost function and used the validation set to regularise the model with \textbf{early stopping}.
 This technique monitored the reconstruction loss on an out-of-sample dataset,
-allowing the model to stop training within a set ``patience'' threshold, after reaching a local minimum on the validation error.
-The test set was finally used to assess the performances of the model using the best set of parameters.
+allowing the model to stop training within a set ``patience'' threshold after reaching a local minimum on the validation error.
+The test set was finally used to assess the model's performance using the best set of parameters.
 
 I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
 and \textbf{data augmentation}, by including in the training data the episodes that shared the same tags with their
-parent programme. \textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performances.
+parent programme. \textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performance.
 
-\subsection{Inference}
+\subsection{Content similarity}
 
-Item similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings \cite{GoogleForDevelopers:EmbeddingSimilarity}.
-This metric is insensitive to the magnitude of the vectors, and because high-frequency values tend to have a larger magnitude, it mitigates the impact of
-popularity in the similarity calculation. One-hot encoded vectors lack of meaningful relations between them.
+Content similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings \cite{GoogleForDevelopers:EmbeddingSimilarity}.
+This metric is insensitive to the magnitude of the vectors. Because high-frequency values tend to have a larger magnitude,
+it mitigates the impact of popularity in the similarity calculation.
+One-hot encoded vectors lack meaningful relations between them.
 They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multidimensional Euclidean space.
 Because each pair can only have a finite number of angles,
 the cosine similarity will also assume a finite number of discrete values between 0 and 1, causing information
 loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
-is only possible if the angle $\theta$ of any vector pair can assume a continuous value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
+is only possible if the angle $\theta$ of any vector pair can assume a value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
 the use of embeddings.
 
 \subsection{Tools and frameworks}
@@ -59,19 +59,20 @@ The entire project was written in \textbf{Python}. It is the \textit{de facto} p
 and machine learning tasks. Python has an established, diverse and well-documented ecosystem of external libraries
 and frameworks that facilitated the job, and it is also the language of choice at the BBC.
 
-I used \textbf{Pandas} only for tabular data manipulation, to generate and store the one-hot encoded vectors. Unfortunately, it wasn't possible
-to use it for exploratory data analysis (EDA), because the iPlayer catalogue used in development had roughly one-year worth of data and it didn't
-fit in memory, causing Pandas to crash. For this reason, I used \textbf{Dask}. It is a library capable of running out-of-memory and
-parallel execution for faster processing on single-node machines and distributed computing on multi-nodes machines, while using the familiar Pandas API.
+I used \textbf{Pandas} only for tabular data manipulation to generate and store the one-hot encoded vectors.
+Unfortunately, using it for exploratory data analysis (EDA) wasn't possible because the iPlayer catalogue
+had roughly one year's worth of data, which didn't fit in memory, causing Pandas to crash.
+Therefore, I used \textbf{Dask}, a library capable of running out-of-memory and parallel execution
+for faster processing on single-node machines and distributed computing on multi-node machines
+while using the familiar Pandas API.
 
-I used \textbf{TensorFlow} and \textbf{Keras} for modelling, to build and train the encoder-decoder neural network architecture,
-and \textbf{Keras Tuner} for
-hyperparameters tuning. I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
+I used \textbf{TensorFlow} and \textbf{Keras} for modelling to build and train the encoder-decoder neural network architecture.
+\textbf{Keras Tuner} for hyperparameters tuning.
+I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
 the cosine similarity calculation, and I was already familiar with its API.
 
-For data visualisation I used a combination of \textbf{Matplotlib} and \textbf{Seaborn}, while I used \textbf{rdflib} to fetch and parse
-the RDF documents from the BBC Ontology. These documents represented the metadata values and contained the actual entity label.
-This label was needed to hydrate the set of metadata for each item, to visualise the recommendations for testing purposes.
+I used a combination of \textbf{Matplotlib} and \textbf{Seaborn} for visualisation and \textbf{rdflib} to fetch and parse
+the RDF documents from the BBC Ontology to extract the labels needed to visualise the recommendations for testing purposes.
 Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance and formatting.
 Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository
 and for collaboration, and \textbf{AWS Sagemaker} to run the pipeline on more capable virtual machines, especially during hyperparameter tuning.
