@@ -15,8 +15,8 @@ of Content-To-Content similarity recommendations for BBC iPlayer.
 
 - The project report should be in the form of a paper based or electronic report.
 - All work relating to the project report must be started and completed during the EPA period.
-- The project report will comprise of a written report with a word count of 5,000 words. A tolerance of
-plus or minus 10% is allowed. Appendices, references, diagrams and tables will not be included in
+- The project report will comprise of a written report with a word count of 5,000 words plus/minus
+a tolerance of 10% [4500, 5500] is allowed. Appendices, references, diagrams and tables will not be included in
 this total.
 
 The format of the project report should be:
