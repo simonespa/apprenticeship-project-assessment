@@ -5,26 +5,29 @@
 
 \section{Implementation and performance metrics}
 
-I used an undercomplete autoencoder to compress the high dimensional one-hot encoded vectors to a lower dimensional embedding representation.
-This technique captured non-linearity by learning the underlying latent structure of the data, which was key to represent the original
+I used an \textit{undercomplete autoencoder} to compress the high-dimensional one-hot encoded vectors to a lower-dimensional embedding representation.
+This technique captured non-linearity by learning the underlying latent structure of the data, which was vital to represent the original
 Passport tags in a geometrical space, exploiting local proximity as a measure of similarity.
 
-Because the autoencoder has a symmetrical architecture between the \textit{encoder} and the \textit{decoder}, the input and output layers
-had the same dimensions: 8982 nodes. This number corresponded to the size of the ohe-hot encoded array.
+Because the autoencoder has a symmetrical architecture between the \textit{encoder} and the \textit{decoder},
+the input and output layers had equal dimensions: 8982 nodes.
+This number corresponded to the size of the one-hot encoded array.
 
-Some of the hyperparameters were decided based on the nature of the problem. The input data was a tensor of zeros and ones,
+Some of the hyperparameters were decided based on the nature of the problem. The input data was a tensor of zeros and ones
 and the main objective of the network was to reconstruct the output with minimal loss.
-I used the \textit{Sigmoid} activation function for the output layer, and \textit{binary cross-entropy} as loss function,
+I used the \textit{Sigmoid} activation function for the output layer and \textit{binary cross-entropy} as a loss function
 to allow the network to push the values of the reconstructed output as close as possible to 0 and 1.
-I didn't use the \textit{SoftMax} activation function for the output layer, because each single node needed to be able
+I didn't use the \textit{SoftMax} activation function for the output layer because each single node needed to be able
 to assume those values.
-I didn't use any residual-based loss function either - such as MSE or MAE - because they don't have a very steep slope
-for 0/1 values, to allow the gradient to move fast enough.
-Which is why the negative log loss was the best choice, because it massively penalises huge differences between $y$ and  $\hat{y}$,
+I didn't use any residual-based loss function either because they don't have a steep slope when the prediction is far from the actual value,
+allowing the gradient to move fast enough.
+The negative log loss was the best choice because it heavily penalises significant differences between $y$ and $\hat{y}$,
 with a natural logarithmic progression.
-I used the \textit{Rectified Linear Unit (ReLU)} as activation function
-for the hidden layers, while testing other variants like \textit{Leaky ReLU (LReLU)} and \textit{Parametric ReLU (PReLU)},
-but without any relevant improvements in performance. Some other hyperparameters were:
+
+I used the \textit{Rectified Linear Unit (ReLU)} as an activation function for the hidden layers
+while testing other variants like \textit{Leaky ReLU (LReLU)} and \textit{Parametric ReLU (PReLU)},
+but without any relevant improvements in performance.
+Some other hyperparameters were:
 
 \begin{itemize}
   \item the optimizer: Adam
@@ -32,14 +35,15 @@ but without any relevant improvements in performance. Some other hyperparameters
   \item batch size: 300
   \item dropout rate: 0.2
   \item early stopping patience: 10
-  \item early stopping monitoring: binary cross entropy on validation set
+  \item early stopping monitoring: binary cross-entropy on the validation set
   \item data split: 80\% training, 10\% validation, 10\% test
 \end{itemize}
 
-The remaining hyperparameters were selected through a final round of optimisations. I decided to use a "Bandit-based" approach
+A final round of hyperparameter optimisation selected the remaining ones.
+I decided to use a "Bandit-based" approach
 called \textit{Hyperband} \cite{DBLP:journals/corr/LiJDRT16}, which improves upon \textit{Random Search}
-by running fewer epochs on the randomly sampled set of parameters,
-and move on to the next stage by only testing the best performing ones, returning a ranked list of the best hyperparameter sets.
+by running fewer epochs on the randomly sampled set of parameters
+and moving on to the next stage by only testing the best-performing ones, returning a ranked list of the best hyperparameter sets.
 The hyperparameters considered by Hyperband were:
 
 \begin{itemize}
@@ -50,35 +54,36 @@ The hyperparameters considered by Hyperband were:
   \item whether to use batch normalisation
 \end{itemize}
 
-The number of hidden layers was a positive odd integer $N > 0$, where $N-1$ layers were used for the encoder and the
-the decoder, and one for the bottleneck in the middle.
-If the value was $1$, the network would only have the bottleneck.
+The number of hidden layers was a positive odd integer $N > 0$.
+The encoder and decoder had $N-1$ layers, and one was used for the bottleneck in the middle.
+If the value were $1$, the network would only have the bottleneck.
 
 The number of nodes per layer was a positive integer $N > 0$. Unfortunately, the number of combinations was too high to be
 meaningfully optimised. To reduce the complexity, I decided to couple the number of nodes per layer as a progression
 of integer divisions by 2.
 Each hidden layer in the encoder had half the number of nodes compared to the previous one, and double the amount of the successive one
-(and \textit{vice versa} in the decoder), except for the layers close to the input and output. In that case, they could assume any
-of the set values, depending on the number of hidden layers and embeddings size. For example, because I had 8982 nodes in input, the progression of layer dimensions
-was: 4491, 2245, 1122, 561, 280, 140 and so on. The embedding size was also bound to assume one of these values, and would also impact
+(and \textit{vice versa} in the decoder), except for the layers close to the input and output.
+In that case, they could assume any of the values, depending on the number of hidden layers and embedding size.
+For example, because I had 8982 nodes in input, the progression of layer dimensions
+was \verb|[4491, 2245, 1122, 561, 280, 140, ...]|.
+The embedding size was also bound to assume one of these values and would impact
 the maximum number of hidden layers allowed.
-Therefore, a network with 5 hidden layers and an embedding size of \verb|280|
-would have had the following configuration: \verb|8982 -> 1122 -> 561 -> 280 -> 561 -> 1122 -> 8982|. While a network with
-3 hidden layers but an embedding size of \verb|2245| would have had the following configuration:
+Therefore, a network with \verb|5| hidden layers and an embedding size of \verb|280|
+would have had the following configuration: \verb|8982 -> 1122 -> 561 -> 280 -> 561 -> 1122 -> 8982|.
+While a network with \verb|3| hidden layers but an embedding size of \verb|2245| would have had the following configuration:
 \verb|8982 -> 4491 -> 2245 -> 4491 -> 8982|, representing the maximum extension of the progression.
 
-The strength of this approach was the efficient use of space, and the fast inference time.
-The space scaled linearly with respect to the size of the input to store the embeddings,
+The strength of this approach was the efficient use of space and the fast inference time.
+The space scaled linearly with respect to the input size to store the embeddings
 and quadratically to store the similarity scores.
-Hyperparameter tuning took quite some time, but this drawback was compensated by the fact that training was performed offline,
-while the recommendations were cached and served instantly. In addition, re-training could be scheduled to cover for the new
-programmes added to the iPlayer catalogue, and the unavailable ones being removed.
+Hyperparameter tuning took quite some time, but this drawback was compensated by the fact that training was performed offline
+while the recommendations were cached and served instantly.
+In addition, retraining could be scheduled to cover the new programmes added to the iPlayer catalogue and the unavailable ones being removed.
 The main weakness was the model's interpretability.
-The autoencoder is a \textit{black box} by definition, and the
-use of embeddings to calculate the similarity just made the problem worse.
+The autoencoder is a black box by definition, and using embeddings to calculate the similarity just worsened the problem.
 It was practically impossible to interpret which of the tags influenced
-the ranking in the top-K list, by untangling the weights and biases of the neural network.
-It was also difficult to provide explanations using model-agnostic techniques like SHAP,
+the ranking in the top-K recommendation by untangling the weights and biases of the neural network.
+It was also challenging to provide explanations using model-agnostic techniques like SHAP
 because the recommendations were calculated by some distance metric, applied on
-humanly meaningless embeddings, that needed to be linked to the original input, that in turn needed to be
-decoded back to the original tags.
+humanly meaningless embeddings that needed to be linked to the original input,
+which needed to be decoded back to the original tags.
