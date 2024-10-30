@@ -6,14 +6,15 @@
 % Reconsider your stakeholders, did the project have the expected outcomes for them?
 \subsection{Results}
 
-This is a general solution that works with any content that uses Passport tags,
-and could serve recommendations for multiple BBC products.
-The adoption of this solution will reduce effort, duplication of code and data, and as a consequence, costs.
-I shared the findings with the stakeholders, explaining the main benefits and showing the results using the visualisation tool I built.
-I presented it once to the data scientists and engineers of the iPlayer recommendations team I worked with,
-and another time to the team in charge of the non-personalised recommendations for the entire BBC.
-The feedback was positive in both cases and we discussed at lenght how to move forward with this project, including
-what to build as an MVP to finally A/B test the solution.
+This general solution works with any content that uses Passport tags,
+and could provide recommendations for multiple BBC products.
+Adopting it would reduce effort, duplication of code and data, and, consequently, costs.
+I shared the findings with the stakeholders,
+explaining the main benefits and showing the results using the visualisation tool I built.
+I presented it once to the data scientists and engineers of the iPlayer recommendations team
+I worked with and another time to the team in charge of the non-personalised recommendations for the entire BBC.
+The feedback was positive in both cases, and we discussed how to move forward with this project,
+including the possibility of an A/B test.
 
 % State how your results have aligned with your original objectives and measures of success
 % State what recommendations have been made to the business as a result of this project
@@ -24,57 +25,61 @@ what to build as an MVP to finally A/B test the solution.
 \subsection{Summary of findings and recommendations}
 
 The results were perfectly aligned with the initial objectives and measure of success set at the beginning of the project.
-My recommendation was to build an initial minimum viable product (MVP), consisting of a Sagemaker pipeline
-built on the AWS development account, that ingested batch Passport tags.
-This would allow us to break down the engineering effort, and spot any blockers/challenges that need to be addressed
-as early as possible, so that we can correct them and/or reconsider some of the assumptions ahead of the production build.
+I recommended building an initial minimum viable product (MVP) consisting of a Sagemaker pipeline
+built on the AWS development account that ingested batch Passport tags.
+This recommendation would allow us to break down the engineering effort and spot any blockers/challenges that must be addressed
+as early as possible to correct them or reconsider some assumptions ahead of the production build.
 
 We would need to build two pipelines, one for training and one for inference to generate the embeddings and the similarity scores.
-The embeddings and the similarities score need to be cached to improve performances.
-The second stage of this approach would require the integration with UCED to fetch real-time data automatically.
+The embeddings and the similarities score need to be cached to improve performance.
+The second stage of this approach would require integrating UCED to fetch real-time data automatically.
 
-If this solution is viable and passes the A/B test, it could also be used to generate embeddings for
-other personalised recommenders that use item metadata in conjunction with user interactions and/or contextual data such as
-day and time of interaction, location, device used, etc.
+If this solution is viable and passes the A/B test,
+it could also be employed to generate embeddings for other personalised recommenders that use item metadata
+in conjunction with user interactions and contextual data such as day and time of interaction, location and device used.
 
-The project could be further expanded by exploiting the graph nature of the data using graph neural network (GNN),
-and in particular, a graph autoencoder (GAE) to learn meaningful representation of the graph data,
+The project could be further expanded by exploiting the graph nature of the data using a graph neural network (GNN) and,
+in particular, a graph autoencoder (GAE) to learn a meaningful representation of the graph data,
 capturing the topological structure and the node content.
-This could improve upon the current autoencoder, that flattens the graph structure in a list of tags and
-relies on the positional encoding of these tags to generate the embeddings.
+This extension could improve upon the current autoencoder,
+which flattens the graph structure in a list of tags and relies on the positional encoding of these tags to generate the embeddings.
 This effort will require further research and prototyping.
 
 % Outline the repercussions the execution of this project has had for yourself, your colleagues, the stakeholders and the business as a whole.
 \subsection{Implications}
 
-The project presented a unique opportunity for me to work on an end-to-end machine learning pipeline from data preprocessing
-to inference, practicing my technical skills,
-building a real neural network, learning about embedding techniques, and content-based
-recommendation systems. The positive feedback from stakeholders has reinforced my professional confidence and
-provided invaluable experience in presenting data-driven solutions to a business audience.
+The project presented a unique opportunity for me to work on an end-to-end machine learning pipeline from data preprocessing to inference,
+practising my technical skills, building a real neural network,
+and learning about embedding techniques and content-based recommendation systems.
+The positive feedback from stakeholders has reinforced my professional confidence and provided invaluable experience
+in presenting data-driven solutions to a business audience.
 
 For my colleagues and the team, this project has established a replicable framework for C2C similarity recommendations
-that can be adapted to other BBC products. The modularity of the solution enables flexibility in extending it to
-multimodal content, enhancing the potential for collaborative developments across departments.
-This can promote knowledge sharing and foster a data-centric approach to problem-solving within the wider team,
-as members can leverage this solution to address similar business problems.
+that can be adapted to other BBC products. The solution's modularity enables flexibility in
+extending it to multimodal content, enhancing the potential for collaborative developments across departments.
+This adaptability can promote knowledge sharing and foster a data-centric approach to problem-solving in the broader team,
+as members can leverage this solution to address similar business problems and build upon it
 
-For stakeholders and the business, the project presents a scalable solution to reduce data redundancies,
+The project presents a scalable solution for stakeholders and the business to reduce data redundancies,
 decrease maintenance overhead, and potentially reduce costs associated with content recommendation systems.
-The approach taken provides a standardized method for generating ``More Like This'' suggestions,
-thereby improving user engagement on non-personalised content, with a consistent experience across the BBC portfolio.
-Moreover, the project's adaptability encourages strategic, data-driven content management across the organization,
+The approach provided a standardised method for generating "More Like This" suggestions,
+potentially improving user engagement on non-personalised content,
+with a consistent experience across the BBC portfolio.
+Moreover, the project's adaptability encourages strategic, data-driven content management across the organisation,
 supporting future initiatives with robust foundations for content similarity and recommendation.
-Overall, this project not only aligns with business goals of optimizing resource allocation but also empowers
-the organization with a sustainable, scalable recommendation solution for future developments.
+Overall, this project not only aligns with the business goals of optimising resource allocation but also empowers the organisation with a sustainable,
+scalable recommendation solution for future developments.
 
 % State some of the shortcomings of your work either as a result of limitations in the data, the overall model performance or the time available to implement the project.
 \subsection{Caveats and limitations}
 
-Data drift can cause a significant decrease in performance, requiring a model re-training.
-When new programmes are added to the catalogue,
-their feature vectors need to be encoded, the encoded vectors need to be transformed in embeddings,
-and the new cosine similarities need to be re-calculated.
+Data drift can cause a significant decrease in performance,
+requiring a model re-training.
+When new programs are added to the iPlayer catalogue,
+their feature vectors must be encoded,
+the encoded vectors must be transformed into embeddings,
+and the new cosine similarities must be re-calculated.
 Also, both the encodings and the embeddings need to be cached.
-When the new programmes don't share some or all of the tags, the encoding phase
-produces vectors with some or all zeros, indicative of a loss of information.
+When the new programs don't share some or all of the tags,
+the encoding phase produces vectors with some or all zeros,
+indicative of a loss of information.
