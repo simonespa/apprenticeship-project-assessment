@@ -66,7 +66,7 @@ Each hidden layer in the encoder had half the number of nodes compared to the pr
 In that case, they could assume any of the values, depending on the number of hidden layers and embedding size.
 For example, because I had 8982 nodes in input, the progression of layer dimensions
 was \verb|[4491, 2245, 1122, 561, 280, 140, ...]|.
-The embedding size was also bound to assume one of these values and would impact
+The embedding size was also bound to assume one of these values and it would determine
 the maximum number of hidden layers allowed.
 Therefore, a network with \verb|5| hidden layers and an embedding size of \verb|280|
 would have had the following configuration: \verb|8982 -> 1122 -> 561 -> 280 -> 561 -> 1122 -> 8982|.
