@@ -9,75 +9,77 @@
 
 % Data architecture
 
-News and Sports articles, iPlayer videos on-demand, Sounds podcasts etc. are annotated with the so-called Passport tags.
+BBC News and Sport articles, iPlayer videos or Sounds audio are annotated with Passport tags.
 These tags describe any content produced by the BBC and can be used for retrieval (search) and filtering (recommendations).
 They can be applied either manually by an editorial team with domain knowledge,
 or semi-automatically by machine learning algorithms with human supervision.
 
-Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system,
-a self-service metadata delivery platform that exposes data as a document stream for products to integrate with.
-This platform provides different types of \textit{consumers} such as REST API, AWS S3 bucket, etc.
+Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system.
+This self-service metadata delivery platform exposes data as a document stream for products to integrate.
+This platform provides different types of consumers, such as REST API or, AWS S3 bucket, and so on.
 Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
-metadata annotations. These objects are described by wo properties: ``\verb|predicate|'' and ``\verb|value|''. They represent the name and the value of
-a tag, and are expressed as URL-formatted strings, except for dates. The predicate is a class of the BBC Ontology \cite{BBC:Ontologies}
+metadata annotations. Two properties describe these objects: ``\verb|predicate|'' and ``\verb|value|''.
+They represent a tag's name and value and are expressed as URL-formatted strings, except for dates.
+The predicate is a class of the BBC Ontology \cite{BBC:Ontologies},
 while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
 accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
-These entities are linked to each other and/or to external resources, and are described by attributes and relationships, giving the
-data a graph structure.
+These entities are linked to each other and external resources and are described by attributes and relationships,
+giving the data a graph structure.
 
 % Tools used to gather data
 
-I decided not to integrate with UCED during development, but to use batches of Passport files, manually collected and stored
-on a local folder.
-This was a trade-off that allowed me to train the model with real data, while still keeping the costs down.
-In addition, because the resources needed to
-be created on two AWS accounts, I didn't want to pass the burden of maintenance to the team that owned them,
-without having tested the feasibility of the solution first.
+I decided not to integrate with UCED during development but to use batches of Passport files,
+manually collected and stored in a local folder.
+This trade-off allowed me to train the model with live data while keeping costs down.
+In addition, because I had to create resources on two AWS accounts,
+I didn't want to pass the burden of maintenance to the team that owned them without having tested the feasibility of the solution first.
 
 % Data protection policies and regulation
 
-Content metadata does not constitute personal data and therefore is not subject to the UK GDPR  \cite{UKGDPR}.
+Content metadata does not constitute personal data and, therefore, is not subject to the UK GDPR  \cite{UKGDPR}.
 Nonetheless, this data is encrypted at rest and in transit by default.
 For this reason, no further actions were required during storage and processing.
 
 % Data choice justification and relevance
 
 I chose to use Passport because it provides a set of tags shared across all content produced by the BBC,
-making this a general solution that reduces duplications and ultimately costs. Passport provides a flexible and rich set of tags
-to describe any type of content. Annotations can describe canonical information such as \textit{genre} and \textit{format}, but also things like the \textit{contributor}
-featuring in the programme, the \textit{narrative theme}, the \textit{editorial tone}, what the content is \textit{about}
-or what relevant entities are \textit{mentioned}, etc.
+making this a general solution that reduces duplications and costs.
+Passport offers a flexible and rich set of tags to describe any type of content.
+Annotations can describe canonical information such as \textit{genre} and \textit{format},
+the \textit{contributor} featured in the programme, the \textit{narrative theme}, the \textit{editorial tone},
+what the content is \textit{about} or what relevant entities are \textit{mentioned}, and many more.
 
 % Data preprocessing, errors, bias
 
-During pre-processing, a list of JSON files was loaded into the pipeline and the tags extrapolated into a dictionary data structure.
-The key of the dictionary was the programme ID (called \textit{PID}) and the value was another dictionary describing the annotations.
-A programme can be tagged with the same predicate multiple times, if it has different values,
-while the same value (e.g. ``Music'') can be used by multiple predicates (e.g. \verb|about| or \verb|genre|).
+The pre-processing stage of the pipeline loaded a list of JSON files and extrapolated the tags into a dictionary data structure.
+The dictionary's key was the programme ID - known internally as \textit{PID} - and the value was another dictionary describing the annotations.
+A program can be tagged with the same predicate multiple times if it has different values,
+while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
 
-The dictionary was transformed in a Pandas \textit{Dataframe}, where the rows represented the programmes and the columns the tags.
+The pipeline then transformed this dictionary data structure into a Pandas \textit{Dataframe},
+where the rows represented the programmes, and the columns represented the tags.
 I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because I needed to keep the duplicate values (2nd-level index) across the predicates
 (1st-level index).
-I then populated the cells of the \textit{Dataframe} with the value ``\verb|1|'' if the programme was annotated with the corresponding tag,
-or ``\verb|0|'' otherwise, generating one-hot encoded arrays. I initially started with a vectorisation approach known to be performant,
-using the ``\verb|get_dummies|'' Pandas function. Surprisingly, it was slower and less scalable of the solution that
-I adopted in the end.
+It then populated the cells of the \textit{Dataframe} with the value ``\verb|1|''
+if the program was annotated with the corresponding tag or ``\verb|0|'' otherwise, generating one-hot encoded arrays.
+I initially adopted a vectorisation approach known to be performant, using the ``\verb|get_dummies|'' Pandas function.
+Surprisingly, this method was slower and less scalable than the solution that I adopted in the end.
 
-A source of bias in the dataset was the ``\verb|mentions|'' tag. This type of annotation is automatically generated by an algorithm that extracts
+A source of bias in the dataset was the ``\verb|mentions|'' tag. This annotation type is automatically generated by an algorithm that extracts
 terms deemed important, appearing in the text of an article or the transcript of an audio/video content.
-If something is ``mentioned'', doesn't necessarily describe what the content is about, because of the intrinsic ambiguities of natural languages.
-Figure of speech devices such as metaphors, analogies, allegories, etc., alter the meaning of a sentence for stylistic effect, and can
-misrepresent the main topic. For example, if the phrase ``being over the moon'' is mentioned
+If something is ``mentioned'', it doesn't necessarily describe what the content is about because of the intrinsic ambiguities of natural languages.
+Figure of speech devices, such as metaphors, analogies, allegories, and others, alter the meaning of a sentence for stylistic effect and can misrepresent the main topic.
+For example, if the phrase ``being over the moon'' is mentioned
 by someone delighted about something unrelated to the topic of ``space'' and ``universe'',
-extracting the term ``moon'' as a descriptor, could mislead the representation.
+extracting the term ``moon'' as a descriptor could mislead the representation.
 To mitigate this source of bias, I dropped the tag in favour of ``\verb|about|'', another tag that describes what the content is really about.
-This is manually added by a team of editorials who are trained to tag the content with relevant and topical annotations.
+A team of editorials annotates content with this tag, using relevant topics.
 
 Generating embeddings of one-hot encoded vectors with the same size used in training but with
-unseen tags, leads to unpredictable errors. This is because the encoding is positional,
-and the combination of 1 and 0 learned by the model
-belongs to the tags seen during training. So, I decided to drop the new tags and encode only the ones the model was trained on,
+unseen tags leads to unpredictable errors.
+The encoding is positional, and the combination of \verb|1| and \verb|0| learned by the model
+belongs to the tags seen during training. So, I decided to drop the new tags and encode only the ones the model was trained on
 while padding the rest with zeros, pending retraining to capture the new information.
 Also, some programmes didn't have any annotations entirely. Adding them to the training data, created a group of entries with all zeros.
-If enough observations shared this uninformative characteristic, it could have been picked up by the model.
+If enough observations shared this uninformative characteristic, the model could have picked it up.
 I decided to drop these programmes and include only the ones with at least one annotation.
