@@ -1,6 +1,6 @@
 \documentclass[12pt,a4paper]{article}
 
-\usepackage{hyperref}
+\input{preamble.tex}
 
 \begin{document}
 
@@ -10,6 +10,7 @@
 
 \maketitle
 \tableofcontents
+\listoffigures
 
 \include{sections/01_introduction_and_background.tex}
 
@@ -27,7 +28,7 @@
 
 \include{sections/08_conclusions.tex}
 
-\section{Appendices}
+\include{sections/09_appendices.tex}
 
 \bibliography{refs}
 \bibliographystyle{plain}
