@@ -9,6 +9,14 @@
 
 % Data architecture
 
+Recommended programs can be one-offs like movies or documentaries or have episodes like series or live shows,
+which can be arranged hierarchically.
+A program is mapped internally by a tree-like structure of items defined by an ID called PID and a type.
+Each item of the tree represents a part of the program (a single episode, season, or the programme itself)
+and shares the same Passport tags by inheritance.
+Because of this data structure, each dataset row represents a faction of a recommendable program,
+repeating the same set of tags for a given one.
+
 BBC News and Sport articles, iPlayer videos or Sounds audio are annotated with Passport tags.
 These tags describe any content produced by the BBC and can be used for retrieval (search) and filtering (recommendations).
 They can be applied either manually by an editorial team with domain knowledge,

@@ -1,0 +1,173 @@
+\section{Appendices}
+
+The Passport tags used for this project covered the programs that were available in the iPlayer catalogue
+from 13th June 2023 to 15th April 2024 inclusive.
+
+- There are 79864 episode PIDs in total in the catalogue, where 2807 are also TLEOs (so called orphan episodes)
+- There are 6041 unique TLEO PIDs in the catalogue
+- Episodes that are also TLEOs are a subset of the TLEOs
+- Episodes and TLEOs have 2807 pids in common
+- There are 83098 unique PIDs in the union of episodes and TLEOs
+
+83098 unique items (rows) and 8982 encoded features (columns)
+
+% Code & documentation used for the project e.g. coding developed
+% Screenshots of your code and documentation will suffice here
+\subsection{Code and documentation}
+
+\subsubsection{Data Processing}
+
+Defines an utility function and the "allow list" for Passport tags.
+
+\begin{lstlisting}[language=Python, caption=]
+  import os
+  import json
+  import pandas as pd
+
+  def get(something, fromTag):
+      return fromTag.get(something, '').split('/')[-1].split('#')[0]
+
+  def should_skip(predicate):
+      # These is the list of the predicates we want to consider in the encoding
+      return True if predicate not in [
+          'about',
+          'format',
+          'contributor',
+          'genre',
+          'motivation',
+          'editorialTone',
+          'narrativeTheme',
+          'relevantTo'
+      ] else False
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=]
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=Hyperparameter Tuning]
+  import tensorflow as tf
+  from tensorflow import keras
+  import keras_tuner as kt
+
+  # https://www.tensorflow.org/tutorials/keras/keras_tuner
+
+  input_size = X_train.shape[1]
+
+  # https://keras.io/api/keras_tuner/hyperparameters/
+  def build_model(hp: kt.HyperParameters):
+    # Parameters Set
+    hidden_layers = hp.Choice('hidden_layers', [1, 3])
+    embeddings_size = hp.Choice('embeddings_size', [70, 140, 280, 560])
+    batch_norm = hp.Boolean('batch_norm')
+    dropout = hp.Boolean('dropout')
+    learning_rate = hp.Choice('learning_rate', [0.1, 0.01, 0.001])
+
+    activation = 'relu'
+    dropout_rate = 0.2
+
+    model = keras.Sequential()
+    model.add(keras.layers.InputLayer(input_shape=(input_size,)))
+
+    if hidden_layers == 1:
+      model.add(keras.layers.Dense(
+        units=embeddings_size,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+    if hidden_layers == 3:
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 2,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 2,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+    if hidden_layers == 3:
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 4,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 2,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 2,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(
+        units=embeddings_size * 4,
+        activation=activation
+      ))
+      if batch_norm:
+        model.add(keras.layers.BatchNormalization())
+      if dropout:
+        model.add(keras.layers.Dropout(dropout_rate))
+
+      model.add(keras.layers.Dense(input_size, activation='sigmoid'))
+
+      model.compile(
+          optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
+          loss=keras.losses.BinaryCrossentropy()
+      )
+
+      return model
+\end{lstlisting}
+
+% Include uncertainty/bias/error estimates as appropriate
+\subsection{Statistics}
+
+% Figures / tables / visualisation as appropriate to the project
+\subsection{Figures and tables}
+
+% This is highly recommended
+% The level of detail needed is section headings and page numbers illustrating where the criteria have been met
+\subsection{Mapping of the project report to the pass criteria}
