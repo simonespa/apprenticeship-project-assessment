@@ -10,7 +10,15 @@
 % Data architecture
 
 Recommended programs can be one-offs like movies or documentaries or have episodes like series or live shows.
-A program is mapped internally by a hierarchy of items defined by an ID called PID and a type.
+A program is mapped internally by a hierarchy of items defined by an ID called PID and a type (see figure \ref{fig:program_hierarchy}).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.2]{program_hierarchy}
+  \caption{Internal program hierarchy structure}
+  \label{fig:program_hierarchy}
+\end{figure}
+
 Each item of this tree-like structure represents a part of the program
 (a single episode, a season, or the program itself) and shares the same Passport tags by inheritance.
 These are the observations stored in the dataset, replicating the same set of tags for any program.
@@ -26,7 +34,15 @@ This self-service delivery platform exposes data as a document stream for produc
 It provides different types of consumers, such as REST API, AWS S3 bucket, etc.
 Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
 metadata annotations. Two properties describe these objects: ``\verb|predicate|'' and ``\verb|value|''.
-They represent a tag's name and value and are expressed as URL-formatted strings, except for dates.
+They represent a tag's name and value and are expressed as URL-formatted strings, except for dates (see figure \ref{fig:passport_file}).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{passport_file}
+  \caption{An example of Passport file}
+  \label{fig:passport_file}
+\end{figure}
+
 The predicate is a class of the BBC Ontology \cite{BBC:Ontologies},
 while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
 accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
@@ -58,8 +74,31 @@ what the content is \textit{about} or what relevant entities are \textit{mention
 
 % Data preprocessing, errors, bias
 
-The pre-processing stage of the pipeline loaded a list of JSON files and extrapolated the tags into a dictionary data structure.
-The dictionary's key was the programme ID - known internally as \textit{PID} - and the value was another dictionary describing the annotations.
+The pre-processing stage of the pipeline loaded a list of JSON files, like the example in figure \ref{fig:passport_file}, and extrapolated the tags into a dictionary data structure.
+The dictionary's key was the programme ID - known internally as \textit{PID} - and the value was another dictionary describing the annotations
+(like shown in figures \ref{fig:dataset}, \ref{fig:dataset_row} and \ref{fig:dataset_column}).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{dataset}
+  \caption{The dataset}
+  \label{fig:dataset}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{dataset_row}
+  \caption{An example row of the dataset}
+  \label{fig:dataset_row}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{dataset_column}
+  \caption{An example of multiple values annotated with the same tag}
+  \label{fig:dataset_column}
+\end{figure}
+
 A program can be tagged with the same predicate multiple times if it has different values,
 while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
 
@@ -68,7 +107,15 @@ where the rows represented the programmes, and the columns represented the tags.
 I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because I needed to keep the duplicate values (2nd-level index) across the predicates
 (1st-level index).
 It then populated the cells of the \textit{Dataframe} with the value ``\verb|1|''
-if the program was annotated with the corresponding tag or ``\verb|0|'' otherwise, generating one-hot encoded arrays.
+if the program was annotated with the corresponding tag or ``\verb|0|'' otherwise, generating one-hot encoded arrays (figure \ref{fig:dataset_encoded}).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.3]{dataset_encoded}
+  \caption{The one-hot encoded dataset}
+  \label{fig:dataset_encoded}
+\end{figure}
+
 I initially adopted a vectorisation approach known to be performant, using the ``\verb|get_dummies|'' Pandas function.
 Surprisingly, this method was slower and less scalable than the solution that I adopted in the end.
 

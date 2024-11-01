@@ -9,9 +9,9 @@ The encoding process generated 8982 new features.
 % Screenshots of your code and documentation will suffice here
 \subsection{Code and documentation}
 
-\subsubsection{Data encoding}
+\subsubsection{Data loading and pre-processing}
 
-\begin{lstlisting}[language=Python, caption=One-hot encoding]
+\begin{lstlisting}[language=Python, caption=Passport tags loading and generation of the PID-tags dictionary]
   import os
   import json
   import pandas as pd
@@ -93,7 +93,12 @@ The encoding process generated 8982 new features.
 
     # Builds the dictionary of PIDs, with the associated predicate tags
     pids_dict[pid] = tags
+\end{lstlisting}
 
+\subsubsection{Data encoding}
+
+
+\begin{lstlisting}[language=Python, caption=Pandas DataFrame generation for the one-hot encoded data]
   ###
   ## We need to build a dataframe where the rows are indexed by the PIDs, and the columns indexed by the Passport tags.
   ## To this end, we need to create a multi-index for the columns, where the first level is the tag predicate,
@@ -130,9 +135,9 @@ The encoding process generated 8982 new features.
   df = df.droplevel(level=0, axis=1)
 \end{lstlisting}
 
-\subsubsection{Model training and embedding generation}
+\subsubsection{Model training}
 
-\begin{lstlisting}[language=Python, caption=Data splitting]
+\begin{lstlisting}[language=Python, caption=Dataset splitting]
   import pandas as pd
   from sklearn.model_selection import train_test_split
 
@@ -144,7 +149,7 @@ The encoding process generated 8982 new features.
   assert X_train.shape[0] + X_val.shape[0] + X_test.shape[0] == data.shape[0]
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Model training and optimisation using Keras and Keras Tuner]
+\begin{lstlisting}[language=Python, caption=Keras and Keras Tuner snippet for model training and hyperparameter tuning]
   import tensorflow as tf
   from tensorflow import keras
   import keras_tuner as kt
@@ -289,12 +294,304 @@ The encoding process generated 8982 new features.
   )
 \end{lstlisting}
 
+\begin{lstlisting}[language=Python, caption=Best model re-training]
+  best_hp = tuner.get_best_hyperparameters()[0]
+  model = tuner.hypermodel.build(best_hp)
+
+  history = model.fit(
+    X_train,
+    X_train,
+    epochs=100,
+    batch_size=300,
+    verbose=1,
+    callbacks=[early_stop],
+    validation_data=(X_val, X_val)
+  )
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=Binary cross-entropy loss visualisation]
+  val_loss = history.history['val_loss']
+  best_epoch = val_loss.index(min(val_loss)) + 1
+  print(f'Best epoch: {best_epoch}')
+
+  import matplotlib.pyplot as plt
+
+  plt.plot(history.history['loss'], label='Training')
+  plt.plot(history.history['val_loss'], label='Validation')
+  plt.ylabel('Binary Cross Entropy Loss')
+  plt.xlabel('Epochs')
+  plt.ylim((0, 0.003))
+  plt.legend()
+  plt.show();
+\end{lstlisting}
+
+\subsubsection{Embedding generation}
+
+\begin{lstlisting}[language=Python, caption=Embedding generation]
+  from tensorflow.keras import Model
+
+  # Define Input/Output of the model
+  input = autoencoder.input
+  output = autoencoder.get_layer(name='code').output
+
+  # Define the embedding generator model using the encoder part of the trained Autoencoder model
+  embedding_generator = Model(name='Embedding_Generator', inputs=input, outputs=output)
+
+  # Generate the embeddings by using the output of the bottleneck layer
+  embeddings = embedding_generator.predict(data)
+\end{lstlisting}
+
+\subsubsection{Similarity recommendations}
+
+\begin{lstlisting}[language=Python, caption=Cosine similarity calculation]
+  # Load the catalogue
+  catalogue = pd.read_parquet('catalogue.parquet')
+  # Get the PIDs of the programmes to recommend (Top-Level Editorial Objects)
+  tleo = catalogue.tleo_pid.values
+  # Load the embeddings
+  embeddings = pd.read_parquet('560_1_relu.parquet')
+  # Get the TLEOs embeddings
+  tleo_embeddings = embeddings[embeddings.index.isin(tleo)]
+  # Generate the similarity matrix
+  similarity = pd.DataFrame(cosine_similarity(tleo_embeddings), index=tleo_embeddings.index, columns=tleo_embeddings.index)
+\end{lstlisting}
+
 % Include uncertainty/bias/error estimates as appropriate
 \subsection{Statistics}
 
 % Figures / tables / visualisation as appropriate to the project
 \subsection{Figures and tables}
 
+\subsubsection{Passport tags}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{passport_file}
+%   \caption{An example of Passport file}
+%   \label{fig:passport_file}
+% \end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{passport_stats}
+  \caption{Number of unique value annotations per Passport tag}
+  \label{fig:passport_stats}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_about}
+  \caption{The "about" tag}
+  \label{fig:tag_about}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_contributor}
+  \caption{The "contributor" tag}
+  \label{fig:tag_contributor}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_editorialTone}
+  \caption{The "editorialTone" tag}
+  \label{fig:tag_editorialTone}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_format}
+  \caption{The "format" tag}
+  \label{fig:tag_format}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_genre}
+  \caption{The "genre" tag}
+  \label{fig:tag_genre}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_motivation}
+  \caption{The "motivation" tag}
+  \label{fig:tag_motivation}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_narrativeTheme}
+  \caption{The "narrativeTheme" tag}
+  \label{fig:tag_narrativeTheme}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{tag_relevantTo}
+  \caption{The "relevantTo" tag}
+  \label{fig:tag_relevantTo}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{autoencoder}
+  \caption{Autoencoder architecture}
+  \label{fig:autoencoder}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{binary_cross_entropy}
+  \caption{Binary cross-entropy loss on training and validation}
+  \label{fig:binary_cross_entropy}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{catalogue_size}
+  \caption{Line plot of the iPlayer catalogue size over time}
+  \label{fig:catalogue_size}
+\end{figure}
+
+\subsubsection{The dataset and its encoding}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{dataset}
+%   \caption{The dataset}
+%   \label{fig:dataset}
+% \end{figure}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{dataset_row}
+%   \caption{An example row of the dataset}
+%   \label{fig:dataset_row}
+% \end{figure}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{dataset_column}
+%   \caption{An example of multiple values annotated with the same tag}
+%   \label{fig:dataset_column}
+% \end{figure}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{dataset_encoded}
+%   \caption{The one-hot encoded dataset}
+%   \label{fig:dataset_encoded}
+% \end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{model_summary}
+  \caption{Autoencoder model summary}
+  \label{fig:model_summary}
+\end{figure}
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.5]{program_hierarchy}
+%   \caption{Internal program hierarchy structure}
+%   \label{fig:program_hierarchy}
+% \end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{genres}
+  \caption{Horizontal bar plot to visualise the distribution of genre}
+  \label{fig:genres}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{masterbrands_bars}
+  \caption{Horizontal bar plot visualisation of the BBC channels the programs belong to}
+  \label{fig:masterbrands_bars}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{masterbrands_pie}
+  \caption{Pie chart visualisation of the BBC channels the programs belong to}
+  \label{fig:masterbrands_pie}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{pids_added}
+  \caption{Line plot visualisation of the number of items added daily in the iPlayer Catalogue during the reference period.}
+  \label{fig:pids_added}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{embeddings}
+  \caption{Embeddings dataset}
+  \label{fig:embeddings}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{similarity_scores}
+  \caption{Similarity scores dataset}
+  \label{fig:similarity_scores}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{selected_programmes}
+  \caption{List of selected programmes for testing}
+  \label{fig:selected_programmes}
+\end{figure}
+
+\subsubsection{Recommendations}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{bluey}
+  \caption{The "More Like This" secton on BBC iPlayer}
+  \label{fig:bluey}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{recommendations/0}
+  \caption{"Bluey": the seed program}
+  \label{fig:recommendations:0}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{recommendations/1}
+  \caption{"Patchwork Pals": 1st recommendation (similarity score 0.9602)}
+  \label{fig:recommendations:1}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{recommendations/2}
+  \caption{"Timmy Time": 2nd recommendation (similarity score 0.9474)}
+  \label{fig:recommendations:1}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{recommendations/3}
+  \caption{"Fireman Sam": 3rd recommendation (similarity score 0.9420)}
+  \label{fig:recommendations:1}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{recommendations/4}
+  \caption{"Arthur": 4th recommendation (similarity score 0.9406)}
+  \label{fig:recommendations:1}
+\end{figure}
+
 % This is highly recommended
 % The level of detail needed is section headings and page numbers illustrating where the criteria have been met
-\subsection{Mapping of the project report to the pass criteria}
+% \subsection{Mapping of the project report to the pass criteria}
