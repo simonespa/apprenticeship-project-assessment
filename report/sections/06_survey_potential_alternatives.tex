@@ -5,18 +5,19 @@
 
 \section{Survey of potential alternatives}
 
-I initially considered using \textbf{clustering} on the one-hot encoded features to group similar items.
-The model would have returned the items belonging to the same cluster as the one considered for similarity.
-However, I didn't know how many clusters there could be in the data, and I didn't need to.
-I could have used a density-based technique to auto-discover them,
-but even in that case, some of the clusters could have had less than K items in a top-K similarity scenario.
-I could have returned the items belonging to the nearest cluster if needed, but because of this uncertainty,
-clustering wasn't very useful in this use case.
+\textbf{Clustering} the one-hot encoded features to group similar items wasn't viable.
+Recommenders return ranked lists, while clustering would have returned an unordered list of items
+belonging to the same cluster as the one considered for similarity.
+Furthermore, the number of clusters was unknown.
+Even using a density-based technique to auto-discover them would not have helped
+because similarity ranking requires every pair of items to have a score,
+and grouping does not map with this concept.
+Clustering was a coarse-grained discretisation of similarity,
+and I needed a more granular approach where every item could be compared with everything else.
 
-The geometric interpretation of similarity between two items, is the distance in space between the two vectors representing them.
-Any item has a degree of similarity with all the others, and clustering was just a coarse-grained discretisation of that concept.
-I needed a more granular approach, where every item could be compared with anyone else.
-In geometric terms, I had to calculate the \textbf{pairwise distance} between all vectors, given a metric.
+The intuition was to map the concept of similarity with a geometric interpretation
+and calculate the \textbf{pairwise distance} between the vectors representing the items,
+given a metric and a vector space relevant to the similarity measure.
 So, I discarded clustering as a candidate option.
 
 One-hot encoding doesn't use spatial proximity information to transform the categorical features into ones and zeros.
@@ -42,10 +43,12 @@ Before introducing the chosen approach in the next section and discussing the pr
 I'd like to describe the alternative pre-processing step I also considered to generate vectors
 that didn't suffer from the curse of dimensionality.
 
-\textbf{Hashing} is a non-invertible transformation that can be used for feature reduction.
-It can generate smaller vectors than one-hot encoding, but I didn't adopt it
-because hashing has more hyperparameters, which increases its complexity.
-Most importantly, it introduces the \textit{collision} problem,
+\textbf{Hashing} is a non-invertible mapping technique for constant lookups
+and can be used as a feature transformation technique for tabular data.
+It can generate smaller vectors than one-hot encoding but doesn't encode any concept of similarity either.
+I didn't adopt it because, in comparison, it has more hyperparameters, which increases its complexity.
+In addition, although unlikely, it introduces the collision problem,
 where two distinct inputs can be mapped to the same index in the same target domain.
-This issue could be mitigated by choosing the latest and most robust algorithm to reduce the likelihood of collisions,
-but the trade-off was too computationally expensive for pre-processing.
+This issue could be mitigated by choosing the latest and most robust algorithm to reduce the likelihood of that happening.
+However, the trade-off was too computationally expensive for pre-processing.
+Finally, I needed a pre-processing technique to generate a high-dimensional encoding for the modelling phase to work.

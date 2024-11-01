@@ -1,8 +1,48 @@
 \section{Appendices}
 
+The Passport tags used for this project covered the programs that were available in the iPlayer catalogue
+from 13th June 2023 to 15th April 2024 inclusive.
+
+- There are 79864 episode PIDs in total in the catalogue, where 2807 are also TLEOs (so called orphan episodes)
+- There are 6041 unique TLEO PIDs in the catalogue
+- Episodes that are also TLEOs are a subset of the TLEOs
+- Episodes and TLEOs have 2807 pids in common
+- There are 83098 unique PIDs in the union of episodes and TLEOs
+
+83098 unique items (rows) and 8982 encoded features (columns)
+
 % Code & documentation used for the project e.g. coding developed
 % Screenshots of your code and documentation will suffice here
 \subsection{Code and documentation}
+
+\subsubsection{Data Processing}
+
+Defines an utility function and the "allow list" for Passport tags.
+
+\begin{lstlisting}[language=Python, caption=]
+  import os
+  import json
+  import pandas as pd
+
+  def get(something, fromTag):
+      return fromTag.get(something, '').split('/')[-1].split('#')[0]
+
+  def should_skip(predicate):
+      # These is the list of the predicates we want to consider in the encoding
+      return True if predicate not in [
+          'about',
+          'format',
+          'contributor',
+          'genre',
+          'motivation',
+          'editorialTone',
+          'narrativeTheme',
+          'relevantTo'
+      ] else False
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=]
+\end{lstlisting}
 
 \begin{lstlisting}[language=Python, caption=Hyperparameter Tuning]
   import tensorflow as tf
@@ -124,26 +164,6 @@
 
 % Include uncertainty/bias/error estimates as appropriate
 \subsection{Statistics}
-
-The stats cover the items that were available in the iPlayer catalogue from 2023-06-13 to 2024-04-15.
-
-- There are 79864 episode PIDs in total in the catalogue, where 2807 are also TLEOs (so called orphan episodes)
-- There are 6041 unique TLEO PIDs in the catalogue
-- Episodes that are also TLEOs are a subset of the TLEOs
-- Episodes and TLEOs have 2807 pids in common
-- There are 83098 unique PIDs in the union of episodes and TLEOs
-
-83098 unique items (rows) and 8982 encoded features (columns)
-
-
-Best hyperparameters:
-
-"hidden_layers": 1,
-"embeddings_size": 560,
-"batch_norm": false,
-"dropout": true,
-"learning_rate": 0.01,
-
 
 % Figures / tables / visualisation as appropriate to the project
 \subsection{Figures and tables}
