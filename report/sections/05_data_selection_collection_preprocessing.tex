@@ -9,22 +9,21 @@
 
 % Data architecture
 
-Recommended programs can be one-offs like movies or documentaries or have episodes like series or live shows,
-which can be arranged hierarchically.
-A program is mapped internally by a tree-like structure of items defined by an ID called PID and a type.
-Each item of the tree represents a part of the program (a single episode, season, or the programme itself)
-and shares the same Passport tags by inheritance.
-Because of this data structure, each dataset row represents a faction of a recommendable program,
-repeating the same set of tags for a given one.
+Recommended programs can be one-offs like movies or documentaries or have episodes like series or live shows.
+A program is mapped internally by a hierarchy of items defined by an ID called PID and a type.
+Each item of this tree-like structure represents a part of the program
+(a single episode, a season, or the program itself) and shares the same Passport tags by inheritance.
+These are the observations stored in the dataset, replicating the same set of tags for any program.
+This duplication was used as a data augmentation training technique to increase the model's performance.
 
-BBC News and Sport articles, iPlayer videos or Sounds audio are annotated with Passport tags.
+BBC News and Sport articles, iPlayer videos, and Sounds audios are annotated with Passport tags.
 These tags describe any content produced by the BBC and can be used for retrieval (search) and filtering (recommendations).
-They can be applied either manually by an editorial team with domain knowledge,
+They can be applied either manually by an editorial team with domain knowledge
 or semi-automatically by machine learning algorithms with human supervision.
 
 Passport tags are distributed across the BBC via the universal content exposure and delivery (UCED) system.
-This self-service metadata delivery platform exposes data as a document stream for products to integrate.
-This platform provides different types of consumers, such as REST API or, AWS S3 bucket, and so on.
+This self-service delivery platform exposes data as a document stream for products to integrate.
+It provides different types of consumers, such as REST API, AWS S3 bucket, etc.
 Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
 metadata annotations. Two properties describe these objects: ``\verb|predicate|'' and ``\verb|value|''.
 They represent a tag's name and value and are expressed as URL-formatted strings, except for dates.
