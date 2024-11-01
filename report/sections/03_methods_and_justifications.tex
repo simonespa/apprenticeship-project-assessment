@@ -11,8 +11,11 @@ I used \textbf{one-hot encoding} to transform the categorical features (i.e. the
 It is a simple yet effective encoding method and is perfect for transforming nominal categoricals because it doesn’t introduce
 any ranking or arithmetic relationship among the encoded values.
 The downside of this approach is that it generates high-dimensional sparse arrays,
-introducing the so-called \textit{curse of dimensionality} problem. Nonetheless, this was an accepted drawback that was
-managed in the modelling phase.
+introducing the so-called \textit{curse of dimensionality} problem.
+Nonetheless, this curse became a blessing for the adopted modelling technique,
+which needed high-dimensional data to produce quality results.
+
+
 
 \subsection{Modelling and regularisation}
 
