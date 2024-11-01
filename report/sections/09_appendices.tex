@@ -1,50 +1,150 @@
 \section{Appendices}
 
 The Passport tags used for this project covered the programs that were available in the iPlayer catalogue
-from 13th June 2023 to 15th April 2024 inclusive.
-
-- There are 79864 episode PIDs in total in the catalogue, where 2807 are also TLEOs (so called orphan episodes)
-- There are 6041 unique TLEO PIDs in the catalogue
-- Episodes that are also TLEOs are a subset of the TLEOs
-- Episodes and TLEOs have 2807 pids in common
-- There are 83098 unique PIDs in the union of episodes and TLEOs
-
-83098 unique items (rows) and 8982 encoded features (columns)
+from 13th June 2023 to 15th April 2024 inclusive. The catalogue had 83098 available items, 81311 of which had coverage of Passport tags.
+The 8 tags considered were: \verb|about|, \verb|genre|, \verb|format|, \verb|contributor|, \verb|motivation|, \verb|editorialTone|, \verb|narrativeTheme|, \verb|relevantTo|.
+The encoding process generated 8982 new features.
 
 % Code & documentation used for the project e.g. coding developed
 % Screenshots of your code and documentation will suffice here
 \subsection{Code and documentation}
 
-\subsubsection{Data Processing}
+\subsubsection{Data encoding}
 
-Defines an utility function and the "allow list" for Passport tags.
-
-\begin{lstlisting}[language=Python, caption=]
+\begin{lstlisting}[language=Python, caption=One-hot encoding]
   import os
   import json
   import pandas as pd
 
   def get(something, fromTag):
+    '''
+      Returns the value of the predicate or the tag, extrapolated from
+      the URI-formatted string.
+
+      Predicate example: http://www.bbc.co.uk/ontologies/creativework/genre
+      Value example: http://www.bbc.co.uk/things/1c3b60a9-14eb-484b-a750-9f5b1aeaac31#id
+    '''
       return fromTag.get(something, '').split('/')[-1].split('#')[0]
 
   def should_skip(predicate):
-      # These is the list of the predicates we want to consider in the encoding
-      return True if predicate not in [
-          'about',
-          'format',
-          'contributor',
-          'genre',
-          'motivation',
-          'editorialTone',
-          'narrativeTheme',
-          'relevantTo'
-      ] else False
+    '''
+      Returns true if the Passport tag is not in the allow list
+    '''
+
+    # allow list of predicates to include in the encoding
+    return True if predicate not in [
+      'about',
+      'format',
+      'contributor',
+      'genre',
+      'motivation',
+      'editorialTone',
+      'narrativeTheme',
+      'relevantTo'
+    ] else False
+
+  tags_dict = dict({})
+  pids_dict = dict({})
+  pids_list = []
+
+  # lists the Passport files collected from UCED
+  uced_files = os.listdir('uced')
+
+  ###
+  ## Extrapolates the Passport tags per PID
+  ###
+
+  for file_name in uced_files:
+
+    # gets the PID by splitting "urn:bbc:pips:pid:b05sxyhw.json"
+    pid = file_name.split(':')[4].split('.')[0]
+    pids_list.append(pid)
+
+    # loads the JSON file
+    with open(f'./uced/{file_name}') as json_file:
+        passport = json.loads(json_file.read())
+
+    tags = dict({})
+
+    # for each Passport tag
+    for tag in passport.get('taggings', []):
+      # extrapolates the tag's name from the URI
+      predicate = get('predicate', tag)
+
+      # checks the allow list
+      if should_skip(predicate):
+        continue
+
+      # extrapolates the tag's value from the URI
+      value = get('value', tag)
+
+      # builds a dictionary of predicates containing a list of values related to the current PID
+      if predicate in tags:
+        tags[predicate].append(value)
+      else:
+        tags[predicate] = [value] # list
+
+      # Builds a global dictionary of predicates containing all the tag values used for all PIDs.
+      # These tag values may be repeated across predicates.
+      if predicate in tags_dict:
+        tags_dict[predicate].add(value)
+      else:
+        tags_dict[predicate] = {value} # set
+
+    # Builds the dictionary of PIDs, with the associated predicate tags
+    pids_dict[pid] = tags
+
+  ###
+  ## We need to build a dataframe where the rows are indexed by the PIDs, and the columns indexed by the Passport tags.
+  ## To this end, we need to create a multi-index for the columns, where the first level is the tag predicate,
+  ## and the second level the tag value. This will allow duplicate of values across predicates, and access to any
+  ## given cell by speficying the PID, the predicate and the value, in order for the algorithm to set the value "1"
+  ## to signal the PID is tagged.
+  ###
+
+  columns = []
+
+  for key in tags_dict.keys():
+    columns.extend(pd.MultiIndex.from_product([[key], tags_dict.get(key)]))
+
+  ###
+  ## Creates a zero-padded dataframe of type integer with PIDs as row indexes and the Passport predicates and tags
+  ## as multi-level column index, as specified earlier.
+  ###
+
+  df = pd.DataFrame(0, index=pids_list, columns=pd.MultiIndex.from_tuples(columns), dtype='uint8')
+
+  ###
+  ## Sets 1 for each PID and predicate/tag pair (i.e. One-Hot Encoding)
+  ###
+
+  for pid in pids_dict.keys():
+    for predicate in pids_dict[pid].keys():
+      for tag in pids_dict.get(pid).get(predicate):
+        df.at[pid, (predicate, tag)] = 1
+
+  ###
+  ## Drop the first level of the multi-level column index to flatten the dataframe, now that it is no longer needed.
+  ###
+
+  df = df.droplevel(level=0, axis=1)
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=]
+\subsubsection{Model training and embedding generation}
+
+\begin{lstlisting}[language=Python, caption=Data splitting]
+  import pandas as pd
+  from sklearn.model_selection import train_test_split
+
+  data = pd.read_parquet('passport_encoding.parquet')
+
+  X_train, X_test = train_test_split(data, test_size=0.2)
+  X_val, X_test = train_test_split(X_test, test_size=0.5)
+
+  assert X_train.shape[0] + X_val.shape[0] + X_test.shape[0] == data.shape[0]
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Hyperparameter Tuning]
+\begin{lstlisting}[language=Python, caption=Model training and optimisation using Keras and Keras Tuner]
   import tensorflow as tf
   from tensorflow import keras
   import keras_tuner as kt
@@ -160,6 +260,33 @@ Defines an utility function and the "allow list" for Passport tags.
       )
 
       return model
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption=Hyperband search and early stopping setup]
+  # https://keras.io/api/keras_tuner/tuners/hyperband/
+  tuner = kt.Hyperband(
+    hypermodel=build_model,
+    objective='val_loss',
+    max_epochs=100,
+    factor=2
+  )
+
+  early_stop = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss',
+    mode='min',
+    restore_best_weights=True,
+    patience=10
+  )
+
+  tuner.search(
+    X_train,
+    X_train,
+    epochs=100,
+    batch_size=300,
+    verbose=1,
+    callbacks=[early_stop],
+    validation_data=(X_val, X_val)
+  )
 \end{lstlisting}
 
 % Include uncertainty/bias/error estimates as appropriate
