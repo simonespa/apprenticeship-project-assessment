@@ -9,8 +9,11 @@
 
 % Data architecture
 
-Recommended programs can be one-offs like movies or documentaries or have episodes like series or live shows.
-A program is mapped internally by a hierarchy of items defined by an ID called PID and a type (see figure \ref{fig:program_hierarchy}).
+A program of the BBC iPlayer catalogue is mapped internally by a hierarchy of items defined by an ID called \textit{PID}.
+An item can be of type \textit{episode}, \textit{series}, or \textit{brand}. The \textit{episode} is the leaf of this tree-like structure,
+representing the playable content like an episode of a series, a live show, or a one-off, like a movie or documentary.
+In contrast, \textit{series} and \textit{brand} types are considered ``containers'' and appear at the upper levels of the tree.
+Their children can be other containers or \textit{episode} items [figure \ref{fig:program_hierarchy}] \cite{BBC:ProgrammePages,BBC:ProgrammeUrlStructure}.
 
 \begin{figure}[h]
   \centering
@@ -25,7 +28,7 @@ These are the observations stored in the dataset, replicating the same set of ta
 This duplication was used as a data augmentation training technique to increase the model's performance.
 
 BBC News and Sport articles, iPlayer videos, and Sounds audios are annotated with Passport tags.
-These tags describe any content produced by the BBC and can be used for retrieval (search) and filtering (recommendations).
+These tags describe any BBC content and can be used for retrieval (search) and filtering (recommendations).
 They can be applied either manually by an editorial team with domain knowledge
 or semi-automatically by machine learning algorithms with human supervision.
 
@@ -34,7 +37,7 @@ This self-service delivery platform exposes data as a document stream for produc
 It provides different types of consumers, such as REST API, AWS S3 bucket, etc.
 Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
 metadata annotations. Two properties describe these objects: ``\verb|predicate|'' and ``\verb|value|''.
-They represent a tag's name and value and are expressed as URL-formatted strings, except for dates (see figure \ref{fig:passport_file}).
+They represent a tag's name and value and are expressed as URL-formatted strings, except for dates [figure \ref{fig:passport_file}].
 
 \begin{figure}[h]
   \centering
@@ -43,11 +46,10 @@ They represent a tag's name and value and are expressed as URL-formatted strings
   \label{fig:passport_file}
 \end{figure}
 
-The predicate is a class of the BBC Ontology \cite{BBC:Ontologies},
-while the value can be a date or an entity defined as an RDF \cite{W3C:RDF,W3C:RDF:Concepts} document,
-accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
-These entities are linked to each other and external resources and are described by attributes and relationships,
-giving the data a graph structure.
+The predicate describes the annotation, while the value can be a date or a class of the BBC Ontology \cite{BBC:Ontologies},
+defined as an RDF document \cite{W3C:RDF,W3C:RDF:Concepts}, accessible in Turtle format \cite{W3C:Turtle}
+via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
+These entities are linked to each other and other external resources and form a graph data structure.
 
 % Tools used to gather data
 
@@ -65,55 +67,62 @@ For this reason, no further actions were required during storage and processing.
 
 % Data choice justification and relevance
 
-I chose to use Passport because it provides a set of tags shared across all content produced by the BBC,
+I chose to use Passport because it provides a set of tags shared across all BBC content,
 making this a general solution that reduces duplications and costs.
 Passport offers a flexible and rich set of tags to describe any type of content.
-Annotations can describe canonical information such as \textit{genre} and \textit{format},
-the \textit{contributor} featured in the programme, the \textit{narrative theme}, the \textit{editorial tone},
-what the content is \textit{about} or what relevant entities are \textit{mentioned}, and many more.
+The eight annotations I selected for training were:
+\verb|about|, \verb|genre|, \verb|format|, \verb|contributor|, \verb|motivation|,
+\verb|editorialTone|, \verb|narrativeTheme| and \verb|relevantTo|
+(see figures \ref{fig:passport_stats}, \ref{fig:tag_about}, \ref{fig:tag_contributor},
+\ref{fig:tag_editorialTone}, \ref{fig:tag_format}, \ref{fig:tag_genre}, \ref{fig:tag_motivation}
+\ref{fig:tag_narrativeTheme} and \ref{fig:tag_relevantTo} for example values).
 
 % Data preprocessing, errors, bias
 
-The pre-processing stage of the pipeline loaded a list of JSON files, like the example in figure \ref{fig:passport_file}, and extrapolated the tags into a dictionary data structure.
-The dictionary's key was the programme ID - known internally as \textit{PID} - and the value was another dictionary describing the annotations
-(like shown in figures \ref{fig:dataset}, \ref{fig:dataset_row} and \ref{fig:dataset_column}).
+The dataset used for training contained all the programmes available in the iPlayer catalogue from \verb|13 June 2023| to \verb|15 April 2024|.
+The catalogue had \verb|83098| items, \verb|81311| of which were annotated with Passport tags stored in JSON files, amounting to a coverage of \verb|97.85%|.
+The pipeline's pre-processing stage loaded these files [figure \ref{fig:passport_file}] into a dictionary data structure [code \ref{lst:data_loading}].
+The dictionary's key was the \textit{PID} and the value was another dictionary describing the annotations [figure \ref{fig:dataset}].
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.3]{dataset}
-  \caption{The dataset}
+  \caption{A DataFrame visualisation of the dictionary data structure}
   \label{fig:dataset}
 \end{figure}
+
+A program can be tagged with the same predicate multiple times [figure \ref{fig:dataset_row}] if it has different values,
+while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{dataset_row}
-  \caption{An example row of the dataset}
+  \caption{A sample programme tagging}
   \label{fig:dataset_row}
 \end{figure}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{dataset_column}
-  \caption{An example of multiple values annotated with the same tag}
-  \label{fig:dataset_column}
-\end{figure}
-
-A program can be tagged with the same predicate multiple times if it has different values,
-while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
-
-The pipeline then transformed this dictionary data structure into a Pandas \textit{Dataframe},
+The pipeline then created a Pandas \textit{Dataframe} pre-populated with zeros,
 where the rows represented the programmes, and the columns represented the tags.
-I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because I needed to keep the duplicate values (2nd-level index) across the predicates
-(1st-level index).
-It then populated the cells of the \textit{Dataframe} with the value ``\verb|1|''
-if the program was annotated with the corresponding tag or ``\verb|0|'' otherwise, generating one-hot encoded arrays (figure \ref{fig:dataset_encoded}).
+I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because it needed to keep track of the duplicate values (2nd-level index)
+across the predicates (1st-level index) to access the cells to populate them with the value ``\verb|1|''
+if the program was annotated with the corresponding tag, generating one-hot encoded arrays [figure \ref{fig:dataset_encoded}] [code \ref{lst:data_encoding}].
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.3]{dataset_encoded}
   \caption{The one-hot encoded dataset}
   \label{fig:dataset_encoded}
+\end{figure}
+
+One-hot encoding is positional and doesn't care about the actual tag labels,
+so I decided to extrapolate the URL identifiers [figure \ref{fig:dataset_column}] and use them as tag values,
+speeding up the data loading stage because it didn't need to fetch the labels from the BBC Ontology.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{dataset_column}
+  \caption{A list of hashed values for a given tag}
+  \label{fig:dataset_column}
 \end{figure}
 
 I initially adopted a vectorisation approach known to be performant, using the ``\verb|get_dummies|'' Pandas function.

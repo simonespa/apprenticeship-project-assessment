@@ -1,17 +1,12 @@
 \section{Appendices}
 
-The Passport tags used for this project covered the programs that were available in the iPlayer catalogue
-from 13th June 2023 to 15th April 2024 inclusive. The catalogue had 83098 available items, 81311 of which had coverage of Passport tags.
-The 8 tags considered were: \verb|about|, \verb|genre|, \verb|format|, \verb|contributor|, \verb|motivation|, \verb|editorialTone|, \verb|narrativeTheme|, \verb|relevantTo|.
-The encoding process generated 8982 new features.
-
 % Code & documentation used for the project e.g. coding developed
 % Screenshots of your code and documentation will suffice here
 \subsection{Code and documentation}
 
 \subsubsection{Data loading and pre-processing}
 
-\begin{lstlisting}[language=Python, caption=Passport tags loading and generation of the PID-tags dictionary]
+\begin{lstlisting}[caption={Passport tags loading},label={lst:data_loading}]
   import os
   import json
   import pandas as pd
@@ -95,10 +90,7 @@ The encoding process generated 8982 new features.
     pids_dict[pid] = tags
 \end{lstlisting}
 
-\subsubsection{Data encoding}
-
-
-\begin{lstlisting}[language=Python, caption=Pandas DataFrame generation for the one-hot encoded data]
+\begin{lstlisting}[caption={One-hot encoding of the data in a Pandas DataFrame},label={lst:data_encoding}]
   ###
   ## We need to build a dataframe where the rows are indexed by the PIDs, and the columns indexed by the Passport tags.
   ## To this end, we need to create a multi-index for the columns, where the first level is the tag predicate,
@@ -356,20 +348,10 @@ The encoding process generated 8982 new features.
   similarity = pd.DataFrame(cosine_similarity(tleo_embeddings), index=tleo_embeddings.index, columns=tleo_embeddings.index)
 \end{lstlisting}
 
-% Include uncertainty/bias/error estimates as appropriate
-\subsection{Statistics}
-
 % Figures / tables / visualisation as appropriate to the project
 \subsection{Figures and tables}
 
 \subsubsection{Passport tags}
-
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{passport_file}
-%   \caption{An example of Passport file}
-%   \label{fig:passport_file}
-% \end{figure}
 
 \begin{figure}[h]
   \centering
@@ -434,70 +416,25 @@ The encoding process generated 8982 new features.
   \label{fig:tag_relevantTo}
 \end{figure}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{autoencoder}
-  \caption{Autoencoder architecture}
-  \label{fig:autoencoder}
-\end{figure}
+\subsection{Statistics}
+
+\subsubsection{Catalogue}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{binary_cross_entropy}
-  \caption{Binary cross-entropy loss on training and validation}
-  \label{fig:binary_cross_entropy}
-\end{figure}
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{catalogue_size}
-  \caption{Line plot of the iPlayer catalogue size over time}
+  \includegraphics[scale=0.5]{catalogue_size.png}
+  \caption{Timeseries }
   \label{fig:catalogue_size}
 \end{figure}
 
-\subsubsection{The dataset and its encoding}
-
 % \begin{figure}[h]
 %   \centering
-%   \includegraphics[scale=0.5]{dataset}
-%   \caption{The dataset}
-%   \label{fig:dataset}
+%   \includegraphics[scale=0.5]{}
+%   \caption{Line plot visualisation of the number of items added daily in the iPlayer Catalogue during the reference period.}
+%   \label{fig:pids_added}
 % \end{figure}
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{dataset_row}
-%   \caption{An example row of the dataset}
-%   \label{fig:dataset_row}
-% \end{figure}
-
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{dataset_column}
-%   \caption{An example of multiple values annotated with the same tag}
-%   \label{fig:dataset_column}
-% \end{figure}
-
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{dataset_encoded}
-%   \caption{The one-hot encoded dataset}
-%   \label{fig:dataset_encoded}
-% \end{figure}
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{model_summary}
-  \caption{Autoencoder model summary}
-  \label{fig:model_summary}
-\end{figure}
-
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{program_hierarchy}
-%   \caption{Internal program hierarchy structure}
-%   \label{fig:program_hierarchy}
-% \end{figure}
+\subsubsection{Programme structure}
 
 \begin{figure}[h]
   \centering
@@ -520,11 +457,27 @@ The encoding process generated 8982 new features.
   \label{fig:masterbrands_pie}
 \end{figure}
 
+\subsubsection{Modeling}
+
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{pids_added}
-  \caption{Line plot visualisation of the number of items added daily in the iPlayer Catalogue during the reference period.}
-  \label{fig:pids_added}
+  \includegraphics[scale=0.5]{autoencoder}
+  \caption{Autoencoder architecture}
+  \label{fig:autoencoder}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{binary_cross_entropy}
+  \caption{Binary cross-entropy loss on training and validation}
+  \label{fig:binary_cross_entropy}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{model_summary}
+  \caption{Autoencoder model summary}
+  \label{fig:model_summary}
 \end{figure}
 
 \begin{figure}[h]
@@ -541,14 +494,14 @@ The encoding process generated 8982 new features.
   \label{fig:similarity_scores}
 \end{figure}
 
+\subsubsection{Recommendations}
+
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{selected_programmes}
   \caption{List of selected programmes for testing}
   \label{fig:selected_programmes}
 \end{figure}
-
-\subsubsection{Recommendations}
 
 \begin{figure}[h]
   \centering
