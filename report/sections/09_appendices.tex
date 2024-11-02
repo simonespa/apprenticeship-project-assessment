@@ -363,56 +363,56 @@
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_about}
+  \includegraphics[scale=0.8]{tag_about}
   \caption{The "about" tag}
   \label{fig:tag_about}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_contributor}
+  \includegraphics[scale=0.8]{tag_contributor}
   \caption{The "contributor" tag}
   \label{fig:tag_contributor}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_editorialTone}
+  \includegraphics[scale=0.8]{tag_editorialTone}
   \caption{The "editorialTone" tag}
   \label{fig:tag_editorialTone}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_format}
+  \includegraphics[scale=0.8]{tag_format}
   \caption{The "format" tag}
   \label{fig:tag_format}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_genre}
+  \includegraphics[scale=0.8]{tag_genre}
   \caption{The "genre" tag}
   \label{fig:tag_genre}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_motivation}
+  \includegraphics[scale=0.8]{tag_motivation}
   \caption{The "motivation" tag}
   \label{fig:tag_motivation}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_narrativeTheme}
+  \includegraphics[scale=0.8]{tag_narrativeTheme}
   \caption{The "narrativeTheme" tag}
   \label{fig:tag_narrativeTheme}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{tag_relevantTo}
+  \includegraphics[scale=0.8]{tag_relevantTo}
   \caption{The "relevantTo" tag}
   \label{fig:tag_relevantTo}
 \end{figure}
@@ -454,32 +454,65 @@ retraining the model when big spikes occur.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.3]{catalogue_pids_common.png}
+  \includegraphics[scale=0.3]{catalogue_pids_common}
   \caption{Number of PIDs in common daily}
   \label{fig:catalogue_size_diff}
 \end{figure}
 
-\subsubsection{Programme structure}
+\subsubsection{Programme structure and data distribution}
 
-\begin{figure}[h]
+The \verb|18.19%| of programmes have a \textit{brand-episode} structure.
+An example is the ``Christmas Celebration'' show, presented by Sally Magnusson.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{genres}
-  \caption{Horizontal bar plot to visualise the distribution of genre}
-  \label{fig:genres}
+  \includegraphics[scale=0.5]{pips_brand}
+  \caption{PIP Brand-Episode hierarchy}
+  \label{fig:pips_brand}
 \end{figure}
 
-\begin{figure}[h]
+The \verb|3.25%| of programmes have a Series-Episode structure.
+An example is the four-part series ``Inside Obama's White House''.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{masterbrands_bars}
-  \caption{Horizontal bar plot visualisation of the BBC channels the programs belong to}
-  \label{fig:masterbrands_bars}
+  \includegraphics[scale=0.5]{pips_brand}
+  \caption{PIP Brand-Episode hierarchy}
+  \label{fig:pips_brand}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{masterbrands_pie}
-  \caption{Pie chart visualisation of the BBC channels the programs belong to}
-  \label{fig:masterbrands_pie}
+  \includegraphics[scale=0.5]{pips_series}
+  \caption{PIP Series-Episode hierarchy}
+  \label{fig:pips_series}
+\end{figure}
+
+The \verb|75.12%| of programmes have a Brand-Series-Episode structure.
+An example is the animated adventure comedy series ``Go Jetters''.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{pips_brand_series}
+  \caption{PIP Brand-Series-Episode hierarchy}
+  \label{fig:pips_brand_series}
+\end{figure}
+
+The remaining \verb|3.44%| of programmes are \textit{episode} only.
+An example is the comedy documentary ``The Kemps: All Gold'' about the Spandau Ballet brothers lives.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{programmes_root_item_types}
+  \caption{Root item types distribution}
+  \label{fig:programmes_root_item_types}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{programmes_parent_type.png}
+  \caption{Parent types when the root item is a Brand}
+  \label{fig:programmes_parent_type}
 \end{figure}
 
 \subsubsection{Modeling}
