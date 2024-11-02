@@ -129,7 +129,7 @@
 
 \subsubsection{Model training}
 
-\begin{lstlisting}[language=Python, caption=Dataset splitting]
+\begin{lstlisting}[caption={Dataset splitting}]
   import pandas as pd
   from sklearn.model_selection import train_test_split
 
@@ -141,7 +141,7 @@
   assert X_train.shape[0] + X_val.shape[0] + X_test.shape[0] == data.shape[0]
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Keras and Keras Tuner snippet for model training and hyperparameter tuning]
+\begin{lstlisting}[caption={Model training and hyperparameter tuning with Keras and KerasTuner}]
   import tensorflow as tf
   from tensorflow import keras
   import keras_tuner as kt
@@ -259,7 +259,7 @@
       return model
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Hyperband search and early stopping setup]
+\begin{lstlisting}[caption={Hyperband search and early stopping setup}]
   # https://keras.io/api/keras_tuner/tuners/hyperband/
   tuner = kt.Hyperband(
     hypermodel=build_model,
@@ -286,7 +286,7 @@
   )
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Best model re-training]
+\begin{lstlisting}[caption={Best model re-training}]
   best_hp = tuner.get_best_hyperparameters()[0]
   model = tuner.hypermodel.build(best_hp)
 
@@ -301,7 +301,7 @@
   )
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python, caption=Binary cross-entropy loss visualisation]
+\begin{lstlisting}[caption={Binary cross-entropy loss visualisation}]
   val_loss = history.history['val_loss']
   best_epoch = val_loss.index(min(val_loss)) + 1
   print(f'Best epoch: {best_epoch}')
@@ -317,9 +317,9 @@
   plt.show();
 \end{lstlisting}
 
-\subsubsection{Embedding generation}
+\subsubsection{Embeddings}
 
-\begin{lstlisting}[language=Python, caption=Embedding generation]
+\begin{lstlisting}[caption={Embeddings generation}]
   from tensorflow.keras import Model
 
   # Define Input/Output of the model
@@ -333,9 +333,9 @@
   embeddings = embedding_generator.predict(data)
 \end{lstlisting}
 
-\subsubsection{Similarity recommendations}
+\subsubsection{Recommendations}
 
-\begin{lstlisting}[language=Python, caption=Cosine similarity calculation]
+\begin{lstlisting}[caption={Cosine similarity calculation}]
   # Load the catalogue
   catalogue = pd.read_parquet('catalogue.parquet')
   # Get the PIDs of the programmes to recommend (Top-Level Editorial Objects)
@@ -349,90 +349,115 @@
 \end{lstlisting}
 
 % Figures / tables / visualisation as appropriate to the project
+
 \subsection{Figures and tables}
 
 \subsubsection{Passport tags}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{passport_stats}
   \caption{Number of unique value annotations per Passport tag}
   \label{fig:passport_stats}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_about}
   \caption{The "about" tag}
   \label{fig:tag_about}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_contributor}
   \caption{The "contributor" tag}
   \label{fig:tag_contributor}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_editorialTone}
   \caption{The "editorialTone" tag}
   \label{fig:tag_editorialTone}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_format}
   \caption{The "format" tag}
   \label{fig:tag_format}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_genre}
   \caption{The "genre" tag}
   \label{fig:tag_genre}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_motivation}
   \caption{The "motivation" tag}
   \label{fig:tag_motivation}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_narrativeTheme}
   \caption{The "narrativeTheme" tag}
   \label{fig:tag_narrativeTheme}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{tag_relevantTo}
   \caption{The "relevantTo" tag}
   \label{fig:tag_relevantTo}
 \end{figure}
 
-\subsection{Statistics}
-
 \subsubsection{Catalogue}
 
-\begin{figure}[h]
+The following line plots visualise the daily time-series statistics of the BBC iPlayer catalogue used for training.
+New programmes are added to the catalogue, and unavailable ones are removed hourly.
+These updates change the size and tag composition of the catalogue and need to be monitored for data drift detection,
+retraining the model when big spikes occur.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{catalogue_size.png}
-  \caption{Timeseries }
+  \includegraphics[scale=0.3]{catalogue_size}
+  \caption{Daily catalogue size}
   \label{fig:catalogue_size}
 \end{figure}
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[scale=0.5]{}
-%   \caption{Line plot visualisation of the number of items added daily in the iPlayer Catalogue during the reference period.}
-%   \label{fig:pids_added}
-% \end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{catalogue_pids_added}
+  \caption{Number of PIDs added daily}
+  \label{fig:catalogue_pids_added}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{catalogue_pids_dropped}
+  \caption{Number of PIDs dropped daily}
+  \label{fig:catalogue_pids_dropped}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{catalogue_size_difference}
+  \caption{Daily catalogue size difference}
+  \label{fig:catalogue_size_diff}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.3]{catalogue_pids_common.png}
+  \caption{Number of PIDs in common daily}
+  \label{fig:catalogue_size_diff}
+\end{figure}
 
 \subsubsection{Programme structure}
 
@@ -547,4 +572,5 @@
 
 % This is highly recommended
 % The level of detail needed is section headings and page numbers illustrating where the criteria have been met
-% \subsection{Mapping of the project report to the pass criteria}
+
+\subsection{Mapping of the project report to the pass criteria}
