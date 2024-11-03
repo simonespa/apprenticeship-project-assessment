@@ -35,9 +35,9 @@ I used the \textit{Sigmoid} activation function for the output layer and \textit
 to allow the network to minimise the reconstruction error, pushing the values of the output between zero and one.
 The minimisation of the reconstruction error was the reason for using \textit{binary cross-entropy} as the performance metric.
 I did not use the \textit{SoftMax} activation function for the output layer because every node needed to be able to assume those values.
-I did not use any residual-based loss function either because the change in the loss for wrong predictions
-(i.e. when the slope of the derivative is close to zero) is not as significant as it is for the binary cross-entropy loss,
-partly affecting the step size during backpropagation [figure \ref{fig:loss_comparison}].
+I did not use any residual-based loss function either because the penalty for wrong predictions
+(i.e., when the X-axis value is close to zero) is not as significant as for the binary cross-entropy loss.
+Because the slope of the derivative in this region is not steep enough, it also affects the step size during backpropagation [figure \ref{fig:loss_comparison}].
 The negative log loss was the best option because it heavily penalised significant differences between $y$ and $\hat{y}$,
 with a natural logarithmic progression.
 
@@ -126,7 +126,7 @@ Training completed with a reconstruction error of \verb|0.0002933757205028087| o
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{binary_cross_entropy}
+  \includegraphics[scale=0.4]{binary_cross_entropy}
   \caption{Binary cross-entropy loss on the training and validation sets}
   \label{fig:binary_cross_entropy}
 \end{figure}
