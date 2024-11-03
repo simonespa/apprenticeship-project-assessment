@@ -5,14 +5,15 @@
 
 \section{Implementation and performance metrics}
 
-I used an \textit{undercomplete autoencoder} to compress the high-dimensional one-hot encoded vectors to a lower-dimensional embedding representation.
-This technique captured non-linearity by learning the underlying latent structure of the data, which was vital to represent the original
-Passport tags in a geometrical space, exploiting local proximity as a measure of similarity.
-
+I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898}
+to learn the Passport tags' latent features and reduce the encoded vectors' size.
+The autoencoder is an encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
+I used the ``undercomplete'' variant, which constrains the number of nodes in the hidden layers, creating a ``bottleneck''
+of information flow through the network.
+This bottleneck layer is a form of \textit{regularisation} that forces the model to learn latent attributes from the input
+while reconstructing it with minimal loss. Ultimately, it helps prevent the model from overfitting the training dataset by indexing it like a caching layer.
 The autoencoder has a symmetrical architecture composed by the \textit{encoder} and the \textit{decoder} sub-networks,
-with a bottleneck layer in the middle also known as \textit{code}.
-The input and output layers had both 8982 nodes, which corresponded to the size of the one-hot encoded array
-[figure \ref{fig:autoencoder} and \ref{fig:dataset_encoded}].
+with a bottleneck layer in the middle also known as \textit{code} [figure \ref{fig:autoencoder} and \ref{fig:dataset_encoded}].
 
 \begin{figure}[H]
   \centering
@@ -20,6 +21,13 @@ The input and output layers had both 8982 nodes, which corresponded to the size 
   \caption{Autoencoder architecture}
   \label{fig:autoencoder}
 \end{figure}
+
+I extracted the trained \textit{encoder} segment of the network to compress the one-hot encoded high-dimensional sparse array into
+a lower-dimensional and denser representation called \textit{embeddings} \cite{GoogleForDevelopers:Embeddings} [code \ref{lst:embeddings}].
+This technique solved the curse of dimensionality and the data sparsity problems and improved the calculation
+complexity and the quality of the recommendations at inference time [code \ref{lst:cosine_similarity}].
+
+\subsection{Architecture and hyperparameters}
 
 Some of the hyperparameters were decided based on the nature of the problem.
 The input data was a tensor of zeros and ones, and the network's main objective was to reconstruct the output with minimal loss.
@@ -55,7 +63,8 @@ Some other hyperparameters were:
   \item \textbf{data\_split\_ratio:} \verb|80% training, 10% validation, 10% test|
 \end{itemize}
 
-I used a ``Bandit-based'' approach called \textit{Hyperband} \cite{DBLP:journals/corr/LiJDRT16} to optimise the remaining hyperparameters.
+I used a ``Bandit-based'' approach called \textit{Hyperband} \cite{DBLP:journals/corr/LiJDRT16} to optimise the remaining hyperparameters
+[codes \ref{lst:hyperband},\ref{lst:hyperband_search}].
 It improves upon \textit{Random Search} by running fewer epochs on the randomly sampled set of parameters
 and moving on to the next stage by only testing the best-performing ones, returning a ranked list of the best hyperparameter sets.
 The hyperparameters considered by Hyperband were:
@@ -87,9 +96,12 @@ would have had the following configuration: \verb|8982 -> 1122 -> 560 -> 280 -> 
 While a network with \verb|3| hidden layers but an embedding size of \verb|2245| would have had the following configuration:
 \verb|8982 -> 4491 -> 2245 -> 4491 -> 8982|, representing the maximum extension of the progression.
 
-\subsection{Performances}
+\subsection{Training and validation}
 
-The training phase took \verb|20h 55m 11s| to tune the hyperparameters, with the following best values:
+To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
+it into three chunks: training, validation and test [code \ref{lst:data_splitting}].
+The training phase took \verb|20h 55m 11s| on Sagemaker to tune the hyperparameters,
+returning the following best values:
 
 \begin{itemize}
   \item \textbf{hidden\_layers:} \verb|1|
@@ -99,8 +111,9 @@ The training phase took \verb|20h 55m 11s| to tune the hyperparameters, with the
   \item \textbf{learning\_rate:} \verb|0.01|
 \end{itemize}
 
-The trained model had \verb|8982| nodes for the input and output layers, and \verb|561| nodes for the bottleneck layer.
-It had a total of \verb|10069382 (38.41 MB)| parameters [figure \ref{fig:model_summary}]
+The trained model had \verb|8982| nodes for the input and output layers - which corresponded to the size of
+the one-hot encoded array - and \verb|561| nodes for the bottleneck layer, with a total of \verb|10069382 (38.41 MB)|
+parameters [figure \ref{fig:model_summary}]
 
 \begin{figure}[H]
   \centering
@@ -109,7 +122,8 @@ It had a total of \verb|10069382 (38.41 MB)| parameters [figure \ref{fig:model_s
   \label{fig:model_summary}
 \end{figure}
 
-and it completed training with a reconstruction error of \verb|0.0002933757205028087| on the validation set [\ref{fig:binary_cross_entropy}].
+Training completed with a reconstruction error of \verb|0.0002933757205028087| on the validation set
+[figure \ref{fig:binary_cross_entropy}] [codes \ref{lst:model_retraining},\ref{lst:loss_visualisation}].
 
 \begin{figure}[H]
   \centering
@@ -118,12 +132,31 @@ and it completed training with a reconstruction error of \verb|0.000293375720502
   \label{fig:binary_cross_entropy}
 \end{figure}
 
+\subsection{Strengths and Weaknesses}
+
 The strength of this approach was the efficient use of space and the fast inference time.
-The space scaled linearly with respect to the input size to store the embeddings
-and quadratically to store the similarity scores.
+The space scaled linearly with respect to the input size to store the embeddings [figure \ref{fig:embeddings}]
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{embeddings}
+  \caption{Embeddings dataset}
+  \label{fig:embeddings}
+\end{figure}
+
+and quadratically to store the similarity scores [figure \ref{fig:similarity_scores}].
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.5]{similarity_scores}
+  \caption{Similarity scores dataset}
+  \label{fig:similarity_scores}
+\end{figure}
+
 Hyperparameter tuning took quite some time, but this drawback was compensated by the fact that training was performed offline
 while the recommendations were cached and served instantly.
 In addition, retraining could be scheduled to cover the new programmes added to the iPlayer catalogue and the unavailable ones being removed.
+
 The main weakness was the model's interpretability.
 The autoencoder is a black box by definition, and using embeddings to calculate the similarity just worsened the problem.
 It was practically impossible to interpret which of the tags influenced

@@ -17,21 +17,11 @@ which needed high-dimensional data to produce quality results.
 
 \subsection{Modelling and regularisation}
 
-I trained an \textbf{autoencoder} \cite{DBLP:journals/corr/abs-2003-05991,DBLP:journals/corr/abs-2201-03898}
-to learn the Passport tags' latent features and reduce the encoded vectors' size.
-The autoencoder is an encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
-I used the ``undercomplete'' variant, which constrains the number of nodes in the hidden layers, creating a ``bottleneck''
-of information flow through the network.
-This bottleneck is a form of \textit{regularisation} that forces the model to learn latent attributes from the input
-while reconstructing it with minimal loss. Ultimately, it helps prevent the model from overfitting the training dataset by indexing it like a caching layer.
+I used a \textbf{neural network} to compress the high-dimensional one-hot encoded vectors to a lower-dimensional embedding representation.
+This technique captured non-linearity by learning the underlying latent structure of the data, which was vital to represent the original
+Passport tags in a geometrical space, exploiting local proximity as a measure of similarity.
 
-I extracted the trained \textit{encoder} segment of the network to compress the one-hot encoded high-dimensional sparse array into
-a lower-dimensional and denser representation called \textit{embedding} \cite{GoogleForDevelopers:Embeddings}.
-This technique solved the curse of dimensionality and the data sparsity problems and improved the calculation
-complexity and the quality of the recommendations at inference time.
-
-To improve and assess the ability of the model to \textit{generalise} on unseen data, I randomly shuffled the dataset and split
-it into three chunks: training, validation and test. I used \textbf{hyperparameter tuning} to find the best model parameters
+I used \textbf{hyperparameter tuning} to find the best model parameters
 that minimised the cost function and used the validation set to regularise the model with \textbf{early stopping}.
 This technique monitored the reconstruction loss on an out-of-sample dataset,
 allowing the model to stop training within a set ``patience'' threshold after reaching a local minimum on the validation error.

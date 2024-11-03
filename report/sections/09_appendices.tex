@@ -141,7 +141,7 @@
   assert X_train.shape[0] + X_val.shape[0] + X_test.shape[0] == data.shape[0]
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Model training and hyperparameter tuning with Keras and KerasTuner},label={lst:model_tuning}]
+\begin{lstlisting}[caption={Model training and hyperparameter tuning with Keras and KerasTuner},label={lst:hyperband}]
   import tensorflow as tf
   from tensorflow import keras
   import keras_tuner as kt
@@ -420,7 +420,7 @@
   \label{fig:tag_relevantTo}
 \end{figure}
 
-\subsubsection{Catalogue}
+\subsubsection{Catalogue analysis}
 
 The following line plots visualise the daily time-series statistics of the BBC iPlayer catalogue used for training.
 New programmes are added to the catalogue, and unavailable ones are removed hourly.
@@ -518,67 +518,51 @@ An example is the comedy documentary ``The Kemps: All Gold'' about the Spandau B
   \label{fig:programmes_parent_type}
 \end{figure}
 
-\subsubsection{Embeddings and content similarity}
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{embeddings}
-  \caption{Embeddings dataset}
-  \label{fig:embeddings}
-\end{figure}
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.5]{similarity_scores}
-  \caption{Similarity scores dataset}
-  \label{fig:similarity_scores}
-\end{figure}
-
 \subsubsection{Recommendations}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{selected_programmes}
   \caption{List of selected programmes for testing}
   \label{fig:selected_programmes}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{bluey}
   \caption{The "More Like This" secton on BBC iPlayer}
   \label{fig:bluey}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{recommendations/0}
   \caption{"Bluey" Programme Page on iPlayer}
   \label{fig:recommendations:0}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{recommendations/1}
   \caption{"Patchwork Pals": 1st recommendation (similarity score 0.9602)}
   \label{fig:recommendations:1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{recommendations/2}
   \caption{"Timmy Time": 2nd recommendation (similarity score 0.9474)}
   \label{fig:recommendations:1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{recommendations/3}
   \caption{"Fireman Sam": 3rd recommendation (similarity score 0.9420)}
   \label{fig:recommendations:1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[scale=0.5]{recommendations/4}
   \caption{"Arthur": 4th recommendation (similarity score 0.9406)}
