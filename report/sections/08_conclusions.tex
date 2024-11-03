@@ -73,13 +73,9 @@ scalable recommendation solution for future developments.
 % State some of the shortcomings of your work either as a result of limitations in the data, the overall model performance or the time available to implement the project.
 \subsection{Caveats and limitations}
 
-Data drift can cause a significant decrease in performance,
-requiring a model re-training.
-When new programs are added to the iPlayer catalogue,
-their feature vectors must be encoded,
-the encoded vectors must be transformed into embeddings,
-and the new cosine similarities must be re-calculated.
+Data drift can cause a significant decrease in performance, requiring a model re-training.
+When new programmes are added to the iPlayer catalogue, their feature vectors must be encoded,
+the encoded vectors must be transformed into embeddings, and the new cosine similarities must be re-calculated.
 Also, both the encodings and the embeddings need to be cached.
-When the new programs don't share some or all of the tags,
-the encoding phase produces vectors with some or all zeros,
+When the new programmes don't share some or all of the tags, the encoding phase produces vectors with some or all zeros,
 indicative of a loss of information.

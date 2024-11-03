@@ -23,10 +23,10 @@
 
   def should_skip(predicate):
     '''
-      Returns true if the Passport tag is not in the allow list
+      Returns True if the Passport tag is not in the allow list
     '''
 
-    # allow list of predicates to include in the encoding
+    # Allow list of predicates to include in the encoding
     return True if predicate not in [
       'about',
       'format',
@@ -42,7 +42,7 @@
   pids_dict = dict({})
   pids_list = []
 
-  # lists the Passport files collected from UCED
+  # Lists the Passport files collected from UCED
   uced_files = os.listdir('uced')
 
   ###
@@ -51,29 +51,29 @@
 
   for file_name in uced_files:
 
-    # gets the PID by splitting "urn:bbc:pips:pid:b05sxyhw.json"
+    # Gets the PID by splitting "urn:bbc:pips:pid:b05sxyhw.json"
     pid = file_name.split(':')[4].split('.')[0]
     pids_list.append(pid)
 
-    # loads the JSON file
+    # Loads the JSON file
     with open(f'./uced/{file_name}') as json_file:
         passport = json.loads(json_file.read())
 
     tags = dict({})
 
-    # for each Passport tag
+    # For each Passport tag
     for tag in passport.get('taggings', []):
-      # extrapolates the tag's name from the URI
+      # Extrapolates the tag's name from the URI
       predicate = get('predicate', tag)
 
-      # checks the allow list
+      # Checks the allow list
       if should_skip(predicate):
         continue
 
-      # extrapolates the tag's value from the URI
+      # Extrapolates the tag's value from the URI
       value = get('value', tag)
 
-      # builds a dictionary of predicates containing a list of values related to the current PID
+      # Builds a dictionary of predicates containing a list of values related to the current PID
       if predicate in tags:
         tags[predicate].append(value)
       else:
@@ -92,8 +92,8 @@
 
 \begin{lstlisting}[caption={One-hot encoding of the data in a Pandas DataFrame},label={lst:data_encoding}]
   ###
-  ## We need to build a dataframe where the rows are indexed by the PIDs, and the columns indexed by the Passport tags.
-  ## To this end, we need to create a multi-index for the columns, where the first level is the tag predicate,
+  ## I need to build a dataframe where the rows are indexed by the PIDs, and the columns indexed by the Passport tags.
+  ## To this end, I need to create a multi-index for the columns, where the first level is the tag predicate,
   ## and the second level the tag value. This will allow duplicate of values across predicates, and access to any
   ## given cell by speficying the PID, the predicate and the value, in order for the algorithm to set the value "1"
   ## to signal the PID is tagged.
@@ -105,7 +105,7 @@
     columns.extend(pd.MultiIndex.from_product([[key], tags_dict.get(key)]))
 
   ###
-  ## Creates a zero-padded dataframe of type integer with PIDs as row indexes and the Passport predicates and tags
+  ## Creates a zero-filled dataframe of type integer with PIDs as row indexes and the Passport predicates and tags
   ## as multi-level column index, as specified earlier.
   ###
 
@@ -121,7 +121,7 @@
         df.at[pid, (predicate, tag)] = 1
 
   ###
-  ## Drop the first level of the multi-level column index to flatten the dataframe, now that it is no longer needed.
+  ## Drops the first level of the multi-level column index to flatten the dataframe, now that it is no longer needed.
   ###
 
   df = df.droplevel(level=0, axis=1)
@@ -322,29 +322,29 @@
 \begin{lstlisting}[caption={Embeddings generation}]
   from tensorflow.keras import Model
 
-  # Define Input/Output of the model
+  # Defines Input/Output of the model
   input = autoencoder.input
   output = autoencoder.get_layer(name='code').output
 
-  # Define the embedding generator model using the encoder part of the trained Autoencoder model
+  # Defines the embedding generator model using the encoder part of the trained Autoencoder model
   embedding_generator = Model(name='Embedding_Generator', inputs=input, outputs=output)
 
-  # Generate the embeddings by using the output of the bottleneck layer
+  # Generates the embeddings by using the output of the bottleneck layer
   embeddings = embedding_generator.predict(data)
 \end{lstlisting}
 
 \subsubsection{Recommendations}
 
 \begin{lstlisting}[caption={Cosine similarity calculation}]
-  # Load the catalogue
+  # Loads the catalogue
   catalogue = pd.read_parquet('catalogue.parquet')
-  # Get the PIDs of the programmes to recommend (Top-Level Editorial Objects)
+  # Gets the PIDs of the programmes to recommend (Top-Level Editorial Objects)
   tleo = catalogue.tleo_pid.values
-  # Load the embeddings
+  # Loads the embeddings
   embeddings = pd.read_parquet('560_1_relu.parquet')
-  # Get the TLEOs embeddings
+  # Gets the TLEOs embeddings
   tleo_embeddings = embeddings[embeddings.index.isin(tleo)]
-  # Generate the similarity matrix
+  # Generates the similarity matrix
   similarity = pd.DataFrame(cosine_similarity(tleo_embeddings), index=tleo_embeddings.index, columns=tleo_embeddings.index)
 \end{lstlisting}
 
@@ -550,7 +550,7 @@ An example is the comedy documentary ``The Kemps: All Gold'' about the Spandau B
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{recommendations/0}
-  \caption{"Bluey": the seed program}
+  \caption{"Bluey" Programme Page on iPlayer}
   \label{fig:recommendations:0}
 \end{figure}
 

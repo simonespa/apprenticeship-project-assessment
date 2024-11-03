@@ -9,7 +9,7 @@
 
 % Data architecture
 
-A program of the BBC iPlayer catalogue is mapped internally by a hierarchy of items defined by an ID called \textit{PID}.
+A programme of the BBC iPlayer catalogue is mapped internally by a hierarchy of items defined by an ID called \textit{PID}.
 An item can be of type \textit{episode}, \textit{series}, or \textit{brand}. The \textit{episode} is the leaf of this tree-like structure,
 representing the playable content like an episode of a series, a live show, or a one-off, like a movie or documentary.
 In contrast, \textit{series} and \textit{brand} types are considered ``containers'' and appear at the upper levels of the tree.
@@ -18,13 +18,13 @@ Their children can be other containers or \textit{episode} items [figure \ref{fi
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.2]{program_hierarchy}
-  \caption{Internal program hierarchy structure}
+  \caption{Internal programme hierarchy structure}
   \label{fig:program_hierarchy}
 \end{figure}
 
-Each item of this tree-like structure represents a part of the program
-(a single episode, a season, or the program itself) and shares the same Passport tags by inheritance.
-These are the observations stored in the dataset, replicating the same set of tags for any program.
+Each item of this tree-like structure represents a part of the programme
+(a single episode, a season, or the programme itself) and shares the same Passport tags by inheritance.
+These are the observations stored in the dataset, replicating the same set of tags for any programme.
 This duplication was used as a data augmentation training technique to increase the model's performance.
 
 BBC News and Sport articles, iPlayer videos, and Sounds audios are annotated with Passport tags.
@@ -91,13 +91,13 @@ The dictionary's key was the \textit{PID} and the value was another dictionary d
   \label{fig:dataset}
 \end{figure}
 
-A program can be tagged with the same predicate multiple times [figure \ref{fig:dataset_row}] if it has different values,
+A programme can be tagged with the same predicate multiple times [figure \ref{fig:dataset_row}] if it has different values,
 while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{dataset_row}
-  \caption{A sample programme tagging}
+  \caption{A sample programme with tagging}
   \label{fig:dataset_row}
 \end{figure}
 
@@ -105,7 +105,7 @@ The pipeline then created a Pandas \textit{Dataframe} pre-populated with zeros,
 where the rows represented the programmes, and the columns represented the tags.
 I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because it needed to keep track of the duplicate values (2nd-level index)
 across the predicates (1st-level index) to access the cells to populate them with the value ``\verb|1|''
-if the program was annotated with the corresponding tag, generating one-hot encoded arrays [figure \ref{fig:dataset_encoded}] [code \ref{lst:data_encoding}].
+if the programme was annotated with the corresponding tag, generating one-hot encoded arrays [figure \ref{fig:dataset_encoded}] [code \ref{lst:data_encoding}].
 
 \begin{figure}[h]
   \centering
