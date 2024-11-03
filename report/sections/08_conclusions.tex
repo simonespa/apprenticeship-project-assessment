@@ -6,8 +6,7 @@
 % Reconsider your stakeholders, did the project have the expected outcomes for them?
 \subsection{Results}
 
-This general solution works with any content that uses Passport tags,
-and could provide recommendations for multiple BBC products.
+This general solution works with any content that uses Passport tags and could provide recommendations for multiple BBC products.
 Adopting it would reduce effort, duplication of code and data, and, consequently, costs.
 I shared the findings with the stakeholders,
 explaining the main benefits and showing the results using the visualisation tool I built.
@@ -30,7 +29,7 @@ built on the AWS development account that ingested batch Passport tags.
 This recommendation would allow us to break down the engineering effort and spot any blockers/challenges that must be addressed
 as early as possible to correct them or reconsider some assumptions ahead of the production build.
 
-We would need to build two pipelines, one for training and one for inference to generate the embeddings and the similarity scores.
+We would need to build two pipelines, one for training and one for inference, to generate the embeddings and the similarity scores.
 The embeddings and the similarities score need to be cached to improve performance.
 The second stage of this approach would require integrating UCED to fetch real-time data automatically.
 
@@ -73,9 +72,9 @@ scalable recommendation solution for future developments.
 % State some of the shortcomings of your work either as a result of limitations in the data, the overall model performance or the time available to implement the project.
 \subsection{Caveats and limitations}
 
-Data drift can cause a significant decrease in performance, requiring a model re-training.
-When new programmes are added to the iPlayer catalogue, their feature vectors must be encoded,
+Data drift can cause a significant decrease in performance, requiring a model re-training [figure \ref{catalogue_size_diff}].
+When new programmes are added to the iPlayer catalogue [figure \ref{fig:catalogue_pids_added}], their feature vectors must be encoded,
 the encoded vectors must be transformed into embeddings, and the new cosine similarities must be re-calculated.
 Also, both the encodings and the embeddings need to be cached.
-When the new programmes don't share some or all of the tags, the encoding phase produces vectors with some or all zeros,
+When the new programmes do not share some or all of the tags, the encoding phase produces vectors with some or all zeros,
 indicative of a loss of information.
