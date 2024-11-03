@@ -17,8 +17,8 @@ with a bottleneck layer in the middle also known as \textit{code} [figure \ref{f
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{autoencoder}
-  \caption{Autoencoder architecture}
+  \includegraphics[scale=0.4]{autoencoder}
+  \caption{Undercomplete autoencoder architecture}
   \label{fig:autoencoder}
 \end{figure}
 
@@ -27,7 +27,7 @@ a lower-dimensional and denser representation called \textit{embeddings} \cite{G
 This technique solved the curse of dimensionality and the data sparsity problems and improved the calculation
 complexity and the quality of the recommendations at inference time [code \ref{lst:cosine_similarity}].
 
-\subsection{Architecture and hyperparameters}
+\subsection{Hyperparameters}
 
 Some of the hyperparameters were decided based on the nature of the problem.
 The input data was a tensor of zeros and ones, and the network's main objective was to reconstruct the output with minimal loss.
@@ -136,19 +136,18 @@ Training completed with a reconstruction error of \verb|0.0002933757205028087| o
 
 The strength of this approach was the efficient use of space and the fast inference time.
 The space scaled linearly with respect to the input size to store the embeddings [figure \ref{fig:embeddings}]
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.5]{embeddings}
-  \caption{Embeddings dataset}
-  \label{fig:embeddings}
-\end{figure}
-
 and quadratically to store the similarity scores [figure \ref{fig:similarity_scores}].
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{similarity_scores}
+  \includegraphics[scale=0.26]{embeddings}
+  \caption{Embeddings dataset}
+  \label{fig:embeddings}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.26]{similarity_scores}
   \caption{Similarity scores dataset}
   \label{fig:similarity_scores}
 \end{figure}
@@ -159,5 +158,6 @@ In addition, retraining could be scheduled to cover the new programmes added to 
 
 The main weakness was the model's interpretability.
 The autoencoder is a black box by definition, and using embeddings to calculate the similarity just worsened the problem.
-It was practically impossible to interpret which of the tags influenced
-the ranking in the top-K recommendation by untangling the weights and biases of the neural network.
+It unlikely to interpret which of the tags influence
+the ranking in the top-K recommendation by untangling the weights and biases of the neural network,
+which is why I analysed the composition and distribution of the tags of the recommended programs.

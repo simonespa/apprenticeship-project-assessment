@@ -19,7 +19,9 @@ of Content-To-Content similarity recommendations for BBC iPlayer.
 a tolerance of 10% [4500, 5500] is allowed. Appendices, references, diagrams and tables will not be included in
 this total.
 
-Word Count: 4970
+Word Count:
+- 5261 (including title, headings and captions)
+- 5166 (no title, no captions, only headings)
 
 The format of the project report should be:
 
