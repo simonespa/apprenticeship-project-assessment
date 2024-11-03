@@ -5,7 +5,7 @@
 
 \section{Survey of potential alternatives}
 
-\textbf{Clustering} the one-hot encoded features to group similar items wasn't viable.
+\textbf{Clustering} the one-hot encoded features to group similar items was not viable.
 Recommenders return ranked lists, while clustering would have returned an unordered list of items
 belonging to the same cluster as the one considered for similarity.
 Furthermore, the number of clusters was unknown.
@@ -20,31 +20,27 @@ and calculate the \textbf{pairwise distance} between the vectors representing th
 given a metric and a vector space relevant to the similarity measure.
 So, I discarded clustering as a candidate option.
 
-One-hot encoding doesn't use spatial proximity information to transform the categorical features into ones and zeros.
-It's a transformation process that pivots the unique values of each original feature to be the new variables of the transformed vector.
-If we project these raw vectors in a multidimensional space, we wouldn't be able to use their
-relative position to each other as a similarity measure. Moreover, the high dimensionality of the vectors would have increased
-the computational complexity.
+One-hot encoding does not use spatial proximity information to transform the categorical features into ones and zeros.
+It is a transformation process that pivots the unique values of each original feature to be the new variables of the transformed vector.
+If we project these raw vectors in a multidimensional space, we cannot use their relative position to each other as a similarity measure.
+Moreover, the high dimensionality of the vectors would have increased the computational complexity.
 
 To calculate the pairwise distance efficiently and produce a meaningful representation of similarity,
-the vectors needed to be transformed in a denser and lower dimensional space,
+I had to transform the vectors in a denser and lower dimensional space,
 a manifold embedded into the original high-dimensional ambient space.
 
-I considered dimensionality reduction techniques such as \textbf{principal component analysis (PCA)},
-\textbf{independent component analysis (ICA)} or \textbf{linear discriminant analysis (LDA)},
-but there was a problem with them too.
-Their job is to find a linear projection of the data,
-but this is a strong assumption that misses important non-linear structures.
-I didn't use PCA (which I was more familiar with),
-but I didn't discard the idea of using dimensionality reduction.
+I considered dimensionality reduction techniques such as principal component analysis (PCA),
+independent component analysis (ICA) or linear discriminant analysis (LDA), but there was a problem with them too.
+Their job is to find a linear projection of the data, but this is a strong assumption that misses important non-linear structures.
+I did not use \textbf{PCA} (which I was more familiar with), but I did not discard the idea of using dimensionality reduction.
 I just needed a non-linear approach and turned my attention to \textbf{manifold learning}.
 
 I could have chosen an entirely different encoding technique to generate lower-dimensional vectors
 and avoid the curse of the dimensionality problem from the beginning, so I also investigated \textbf{feature hashing}.
 A hash function is a non-invertible function that can map data of arbitrary size to fixed-size values typically used for constant lookups.
 Hashing can also be used as a feature transformation technique for tabular data.
-It can generate smaller vectors than one-hot encoding but doesn't encode any concept of similarity either.
-I didn't adopt it because, in comparison, it has more hyperparameters, which increases its complexity.
+It can generate smaller vectors than one-hot encoding but does not encode any concept of similarity either.
+I did not adopt it because, in comparison, it has more hyperparameters, which increases its complexity.
 In addition, although unlikely, it introduces the collision problem,
 where two distinct inputs can be mapped to the same index in the same target domain.
 This issue could be mitigated by choosing the latest and most robust algorithm to reduce the likelihood of that happening.
