@@ -11,13 +11,14 @@ The usage in production is low, and its BBC-wide adoption would make access to m
 
 In addition, the current C2C solution is suboptimal and limits the quality of the generated item embeddings.
 The similarity score is directly proportional to the number of values in common between any pairs of items
-on a per-feature basis. However, the commonality is calculated with exact string equality, ignoring any relationship between different
-categorical values expressing a similar concept (e.g. ``comedy'' and ``stand-up comedy'').
+on a per-feature basis. However, the commonality is calculated with exact string equality,
+ignoring any relationship between different categorical values expressing a similar concept (e.g. ``comedy'' and ``stand-up comedy'').
 Moreover, the limited number and type of tags cannot adequately describe the content.
-At the same time, the skewedness of the data distribution and a lack of pre-processing, shifts the recommendations towards the most popular categories.
-Lastly, each similarity score is multiplied by a hardcoded weight that modulates the importance of a feature, but it doesn't solve
-the polarising effect of a skewed distribution. Unfortunately, because these are hyperparameters and not learned weights, the model can't improve
-its performances by minimising them against a cost function.
+At the same time, the skewness of the data distribution and a lack of pre-processing bias the recommendations towards the high-frequency values.
+Lastly, each similarity score is multiplied by a hardcoded weight that modulates the importance of a feature,
+but it does not solve the polarising effect of a skewed distribution.
+Unfortunately, because these are hyperparameters and not learned weights,
+the model cannot improve the performance by minimising them against a cost function.
 \\ \\
 I identified three main opportunities for improvement that can help the BBC meet its goals:
 enhancing the quality of recommendations, reducing costs, and accelerating innovation,
@@ -25,9 +26,8 @@ thus increasing the licence fee value for money. These opportunities are:
 
 \begin{itemize}
   \item \textbf{Improve the quality of the content similarity recommendations}.
-  This solution ingested a rich set of metadata that better described the content
-  and applied a novel technique that improved the descriptive power of the transformed metadata,
-  which improved the quality of the similarity calculation.
+  This solution ingested a rich set of metadata that better described the content and applied a novel technique
+  that improved the descriptive power of the transformed metadata, improving the similarity calculation quality.
   \item \textbf{Build a foundational item-embeddings generator for upstream recommenders}.
   This project provided an immediate solution for non-personalised C2C recommendations that solely rely on content metadata.
   It also provided a foundational approach for embedding generation for upstream personalised recommenders,
