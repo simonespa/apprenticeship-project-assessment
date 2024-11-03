@@ -72,7 +72,7 @@ scalable recommendation solution for future developments.
 % State some of the shortcomings of your work either as a result of limitations in the data, the overall model performance or the time available to implement the project.
 \subsection{Caveats and limitations}
 
-Data drift can cause a significant decrease in performance, requiring a model re-training [figure \ref{catalogue_size_diff}].
+Data drift can cause a significant decrease in performance [figure \ref{fig:catalogue_size_diff}], requiring a model re-training.
 When new programmes are added to the iPlayer catalogue [figure \ref{fig:catalogue_pids_added}], their feature vectors must be encoded,
 the encoded vectors must be transformed into embeddings, and the new cosine similarities must be re-calculated.
 Also, both the encodings and the embeddings need to be cached.
