@@ -129,7 +129,7 @@
 
 \subsubsection{Model training}
 
-\begin{lstlisting}[caption={Dataset splitting}]
+\begin{lstlisting}[caption={Dataset splitting},label={lst:data_splitting}]
   import pandas as pd
   from sklearn.model_selection import train_test_split
 
@@ -141,7 +141,7 @@
   assert X_train.shape[0] + X_val.shape[0] + X_test.shape[0] == data.shape[0]
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Model training and hyperparameter tuning with Keras and KerasTuner}]
+\begin{lstlisting}[caption={Model training and hyperparameter tuning with Keras and KerasTuner},label={lst:model_tuning}]
   import tensorflow as tf
   from tensorflow import keras
   import keras_tuner as kt
@@ -259,7 +259,7 @@
       return model
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Hyperband search and early stopping setup}]
+\begin{lstlisting}[caption={Hyperband search and early stopping setup},label={lst:hyperband_search}]
   # https://keras.io/api/keras_tuner/tuners/hyperband/
   tuner = kt.Hyperband(
     hypermodel=build_model,
@@ -286,7 +286,7 @@
   )
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Best model re-training}]
+\begin{lstlisting}[caption={Best model re-training},label={lst:model_retraining}]
   best_hp = tuner.get_best_hyperparameters()[0]
   model = tuner.hypermodel.build(best_hp)
 
@@ -301,7 +301,7 @@
   )
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Binary cross-entropy loss visualisation}]
+\begin{lstlisting}[caption={Binary cross-entropy loss visualisation},label={lst:loss_visualisation}]
   val_loss = history.history['val_loss']
   best_epoch = val_loss.index(min(val_loss)) + 1
   print(f'Best epoch: {best_epoch}')
@@ -319,7 +319,7 @@
 
 \subsubsection{Embeddings}
 
-\begin{lstlisting}[caption={Embeddings generation}]
+\begin{lstlisting}[caption={Embeddings generation},label={lst:embeddings}]
   from tensorflow.keras import Model
 
   # Defines Input/Output of the model
@@ -335,7 +335,10 @@
 
 \subsubsection{Recommendations}
 
-\begin{lstlisting}[caption={Cosine similarity calculation}]
+\begin{lstlisting}[caption={Cosine similarity calculation},label={lst:cosine_similarity}]
+  import pandas as pd
+  from sklearn.metrics.pairwise import cosine_similarity
+
   # Loads the catalogue
   catalogue = pd.read_parquet('catalogue.parquet')
   # Gets the PIDs of the programmes to recommend (Top-Level Editorial Objects)
