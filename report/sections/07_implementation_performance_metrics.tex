@@ -33,9 +33,9 @@ Some of the hyperparameters were decided based on the nature of the problem.
 The input data was a tensor of zeros and ones, and the network's main objective was to reconstruct the output with minimal loss.
 I used the \textit{Sigmoid} activation function for the output layer and \textit{binary cross-entropy} as a loss function
 to allow the network to minimise the reconstruction error, pushing the values of the output between zero and one.
-The minimisation of the reconstruction error was the reason for using \textit{binary cross-entropy} as the validation metric too.
-I didn't use the \textit{SoftMax} activation function for the output layer because every node needed to be able to assume those values.
-I didn't use any residual-based loss function either because the change in the loss for wrong predictions
+The minimisation of the reconstruction error was the reason for using \textit{binary cross-entropy} as the performance metric.
+I did not use the \textit{SoftMax} activation function for the output layer because every node needed to be able to assume those values.
+I did not use any residual-based loss function either because the change in the loss for wrong predictions
 (i.e. when the slope of the derivative is close to zero) is not as significant as it is for the binary cross-entropy loss,
 partly affecting the step size during backpropagation [figure \ref{fig:loss_comparison}].
 The negative log loss was the best option because it heavily penalised significant differences between $y$ and $\hat{y}$,
@@ -78,18 +78,17 @@ The hyperparameters considered by Hyperband were:
 \end{itemize}
 
 The number of hidden layers was a positive odd integer $N > 0$.
-The encoder and decoder had $N-1$ layers, and one was used for the bottleneck in the middle.
+The network had the encoder and decoder had $N-1$ layers and the bottleneck layer in the middle.
 If the value were $1$, the network would only have the bottleneck.
 
-The number of nodes per layer was a positive integer $N > 0$. Unfortunately, the number of combinations was too high to be
-meaningfully optimised. To reduce the complexity, I decided to couple the number of nodes per layer as a progression
-of integer divisions by 2.
-Each hidden layer in the encoder had half the number of nodes compared to the previous one, and double the amount of the successive one
-(and \textit{vice versa} in the decoder), except for the layers close to the input and output.
-In that case, they could assume any of the values, depending on the number of hidden layers and embedding size.
+The number of nodes per layer was a positive integer $N > 0$. Unfortunately, the number of combinations was too high to be meaningfully optimised.
+To reduce the complexity, I decided to couple the number of nodes per layer as a progression of integer divisions by 2.
+Each hidden layer in the encoder had half the number of nodes compared to the previous one and double the amount of the successive one.
+(and \textit{vice versa} in the decoder), except for the layers adjacent to the input and output.
+In that case, they could assume any progression value depending on the number of hidden layers and embedding size.
 For example, because I had 8982 nodes in input, the progression of layer dimensions
 was \verb|[4491, 2245, 1122, 560, 280, 140, ...]|.
-The embedding size was also bound to assume one of these values and it would determine
+The embedding size was also bound to assume one of these values, which would determine
 the maximum number of hidden layers allowed.
 Therefore, a network with \verb|5| hidden layers and an embedding size of \verb|280|
 would have had the following configuration: \verb|8982 -> 1122 -> 560 -> 280 -> 560 -> 1122 -> 8982|.
@@ -158,6 +157,5 @@ In addition, retraining could be scheduled to cover the new programmes added to 
 
 The main weakness was the model's interpretability.
 The autoencoder is a black box by definition, and using embeddings to calculate the similarity just worsened the problem.
-It unlikely to interpret which of the tags influence
-the ranking in the top-K recommendation by untangling the weights and biases of the neural network,
-which is why I analysed the composition and distribution of the tags of the recommended programs.
+It was unlikely to interpret which of the tags influenced the ranking in the top-K recommendation by untangling the weights and biases of the neural network,
+so I analysed the composition and distribution of the tags of the recommended programs as an alternative.
