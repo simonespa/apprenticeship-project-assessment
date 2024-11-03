@@ -20,8 +20,11 @@ a tolerance of 10% [4500, 5500] is allowed. Appendices, references, diagrams and
 this total.
 
 Word Count:
-- 5261 (including title, headings and captions)
-- 5166 (no title, no captions, only headings)
+- 5265 (title page, section headings and figure captions)
+- 5183 (title page, section headings, no figure captions)
+- 5163 (section headings only)
+
+"\usepackage[none]{hyphenat}"
 
 The format of the project report should be:
 
