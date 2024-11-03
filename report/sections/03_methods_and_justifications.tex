@@ -8,7 +8,7 @@
 \subsection{Data pre-processing}
 
 I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into a numerical vector.
-It is a simple yet effective encoding method and is perfect for transforming nominal categoricals because it doesn’t introduce
+It is a simple yet effective encoding method and is perfect for transforming nominal categoricals because it does not introduce
 any ranking or arithmetic relationship among the encoded values.
 The downside of this approach is that it generates high-dimensional sparse arrays,
 introducing the so-called \textit{curse of dimensionality} problem.
@@ -18,52 +18,55 @@ which needed high-dimensional data to produce quality results.
 \subsection{Modelling and regularisation}
 
 I used a \textbf{neural network} to compress the high-dimensional one-hot encoded vectors to a lower-dimensional embedding representation.
-This technique captured non-linearity by learning the underlying latent structure of the data, which was vital to represent the original
-Passport tags in a geometrical space, exploiting local proximity as a measure of similarity.
+This technique captured non-linearity by learning the underlying latent structure of the data,
+which was vital to representing the original Passport tags in a geometrical space,
+exploiting local proximity as a similarity measure.
 
 I used \textbf{hyperparameter tuning} to find the best model parameters
 that minimised the cost function and used the validation set to regularise the model with \textbf{early stopping}.
 This technique monitored the reconstruction loss on an out-of-sample dataset,
 allowing the model to stop training within a set ``patience'' threshold after reaching a local minimum on the validation error.
-The test set was finally used to assess the model's performance using the best set of parameters.
+Finally, I used the test set to assess the model performance using the best set of parameters.
 
-I used \textbf{dropout} to further regularise the model and make it robust to small changes in the input,
-and \textbf{data augmentation}, by including in the training data the episodes that shared the same tags with their
-parent programme. \textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performance.
+I used \textbf{dropout} to regularise the model further and make it robust to small fluctuations in the input,
+and \textbf{data augmentation}, by including in the training data the episodes that shared the same tags with their parent programme.
+\textbf{Weight decay} and \textbf{batch normalisation} were tested during hyperparameter tuning and discarded for poor performance.
 
 \subsection{Content similarity}
 
-Content similarity was calculated with the \textbf{cosine} of the angle $\theta$ between each pair of embeddings \cite{GoogleForDevelopers:EmbeddingSimilarity}.
-This metric is insensitive to the magnitude of the vectors. Because high-frequency values tend to have a larger magnitude,
-it mitigates the impact of popularity in the similarity calculation.
+I used the \textbf{cosine} of the angle $\theta$ between each pair of embeddings to calculate the similarity scores.
+This metric is insensitive to the magnitude of the vectors, and because high-frequency values tend to have larger magnitudes,
+it mitigates the impact on recommendations of commonly used tags.
+
 One-hot encoded vectors lack meaningful relations between them.
 They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multidimensional Euclidean space.
 Because each pair can only have a finite number of angles,
-the cosine similarity will also assume a finite number of discrete values between 0 and 1, causing information
-loss. Ideally, we would expect the similarity score to assume a continuous value bound between -1 and 1, and this
-is only possible if the angle $\theta$ of any vector pair can assume a value between 0 and 360 (i.e. $0\pi$ and $2\pi$), hence
-the use of embeddings.
+the cosine similarity will also assume a finite number of discrete values between zero and one, causing information loss.
+Ideally, we would expect the similarity score to be a continuous value bound between \verb|-1| and \verb|1|,
+and this is only possible if the angle $\theta$ of any vector pair is a number between \verb|0| and \verb|360|
+(i.e. $0\pi$ and $2\pi$), hence the use of embeddings.
 
 \subsection{Tools and frameworks}
 
-The entire project was written in \textbf{Python}. It is the \textit{de facto} programming language for data science
-and machine learning tasks. Python has an established, diverse and well-documented ecosystem of external libraries
-and frameworks that facilitated the job, and it is also the language of choice at the BBC.
+The entire project was written in \textbf{Python}.
+It is the \textit{de facto} programming language for data science and machine learning tasks.
+Python has an established, diverse, and well-documented ecosystem of external libraries and frameworks that facilitate the job,
+and it is also the language of choice at the BBC.
 
 I used \textbf{Pandas} only for tabular data manipulation to generate and store the one-hot encoded vectors.
-Unfortunately, using it for exploratory data analysis (EDA) wasn't possible because the iPlayer catalogue
-had roughly one year's worth of data, which didn't fit in memory, causing Pandas to crash.
-Therefore, I used \textbf{Dask}, a library capable of running out-of-memory and parallel execution
-for faster processing on single-node machines and distributed computing on multi-node machines
-while using the familiar Pandas API.
+Unfortunately, using it for exploratory data analysis (EDA) was impossible
+because the iPlayer catalogue used in development had roughly one year's worth of data,
+which did not fit in memory, causing Pandas to crash.
+Therefore, I used \textbf{Dask}, a library capable of running out-of-memory and parallel execution for faster processing
+on single-node machines and distributed computing on multi-node machines while using the familiar Pandas API.
 
-I used \textbf{TensorFlow} and \textbf{Keras} for modelling to build and train the encoder-decoder neural network architecture.
-\textbf{Keras Tuner} for hyperparameters tuning.
-I also used \textbf{Scikit-learn} but not for modelling. It provided utility functions for the dataset splitting and
-the cosine similarity calculation, and I was already familiar with its API.
+I used \textbf{TensorFlow} and \textbf{Keras} for modelling to build and train the encoder-decoder neural network architecture
+and \textbf{Keras Tuner} for hyperparameters optimisation. I also used \textbf{Scikit-learn} but not for modelling.
+It provided utility functions for the dataset splitting and the cosine similarity calculation,
+and I was already familiar with its API.
 
-I used a combination of \textbf{Matplotlib} and \textbf{Seaborn} for visualisation and \textbf{rdflib} to fetch and parse
-the RDF documents from the BBC Ontology to extract the labels needed to visualise the recommendations for testing purposes.
-Worth also mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance and formatting.
+I used a combination of \textbf{Matplotlib} and \textbf{Seaborn} for visualisation and \textbf{rdflib} to fetch and parse the RDF documents
+that contained the labels needed to visualise the recommendations for testing purposes.
+It is worth mentioning the use of \textbf{pytest} for unit testing and \textbf{black} for PEP 8 code compliance and formatting.
 Finally, I used \textbf{Jupyter Lab} to edit the project, \textbf{git} for code versioning, \textbf{GitHub} as a remote code repository
 and for collaboration, and \textbf{AWS Sagemaker} to run the pipeline on more capable virtual machines, especially during hyperparameter tuning.
