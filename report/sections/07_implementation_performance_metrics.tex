@@ -10,7 +10,7 @@ to learn the Passport tags' latent features and reduce the encoded vectors' size
 The autoencoder is an encoder-decoder neural network, a self-supervised model capable of capturing non-linearity from the data.
 I used the ``undercomplete'' variant, which constrains the number of nodes in the hidden layers, creating a ``bottleneck''
 of information flow through the network.
-This bottleneck layer is a form of \textit{regularisation} that forces the model to learn latent attributes from the input
+This architecture is a form of \textit{regularisation} that forces the model to learn latent attributes from the input
 while reconstructing it with minimal loss. Ultimately, it helps prevent the model from overfitting the training dataset by indexing it like a caching layer.
 The autoencoder has a symmetrical architecture composed by the \textit{encoder} and the \textit{decoder} sub-networks,
 with a bottleneck layer in the middle also known as \textit{code} [figure \ref{fig:autoencoder} and \ref{fig:dataset_encoded}].
@@ -57,14 +57,14 @@ Some other hyperparameters were:
   \item \textbf{optimizer:} \verb|Adam|
   \item \textbf{number\_of\_epochs:} \verb|100|
   \item \textbf{batch\_size:} \verb|300|
-  \item \textbf{dropout:} \verb|0.2|
+  \item \textbf{dropout\_rate:} \verb|0.2|
   \item \textbf{early\_stopping\_patience:} \verb|10|
   \item \textbf{early\_stopping\_monitoring:} \verb|binary cross-entropy| on the validation set
   \item \textbf{data\_split\_ratio:} \verb|80% training, 10% validation, 10% test|
 \end{itemize}
 
 I used a ``Bandit-based'' approach called \textit{Hyperband} \cite{DBLP:journals/corr/LiJDRT16} to optimise the remaining hyperparameters
-[codes \ref{lst:hyperband},\ref{lst:hyperband_search}].
+[codes \ref{lst:hyperband}, \ref{lst:hyperband_search}].
 It improves upon \textit{Random Search} by running fewer epochs on the randomly sampled set of parameters
 and moving on to the next stage by only testing the best-performing ones, returning a ranked list of the best hyperparameter sets.
 The hyperparameters considered by Hyperband were:
@@ -78,20 +78,23 @@ The hyperparameters considered by Hyperband were:
 \end{itemize}
 
 The number of hidden layers was a positive odd integer $N > 0$.
-The network had the encoder and decoder had $N-1$ layers and the bottleneck layer in the middle.
+The network had the encoder and decoder with $N-1$ layers and the bottleneck layer in the middle.
 If the value were $1$, the network would only have the bottleneck.
 
-The number of nodes per layer was a positive integer $N > 0$. Unfortunately, the number of combinations was too high to be meaningfully optimised.
-To reduce the complexity, I decided to couple the number of nodes per layer as a progression of integer divisions by 2.
-Each hidden layer in the encoder had half the number of nodes compared to the previous one and double the amount of the successive one.
-(and \textit{vice versa} in the decoder), except for the layers adjacent to the input and output.
+The number of nodes per layer was a positive integer $N > 0$.
+Unfortunately, the number of combinations was too high to be meaningfully optimised.
+To reduce the complexity, I decided to limit the values of this hyperparameter to a progression of integer divisions by 2,
+starting from the number of nodes in the input layer.
+Each hidden layer in the encoder could have half the number of nodes compared to the previous one and double the amount of the successive one
+(and \textit{vice versa} for the decoder), except for the layers adjacent to the input and output.
 In that case, they could assume any progression value depending on the number of hidden layers and embedding size.
+
 For example, because I had 8982 nodes in input, the progression of layer dimensions
-was \verb|[4491, 2245, 1122, 560, 280, 140, ...]|.
+was \verb|[4491, 2245, 1122, 561, 280, 140, ...]|.
 The embedding size was also bound to assume one of these values, which would determine
 the maximum number of hidden layers allowed.
 Therefore, a network with \verb|5| hidden layers and an embedding size of \verb|280|
-would have had the following configuration: \verb|8982 -> 1122 -> 560 -> 280 -> 560 -> 1122 -> 8982|.
+would have had the following configuration: \verb|8982 -> 1122 -> 561 -> 280 -> 561 -> 1122 -> 8982|.
 While a network with \verb|3| hidden layers but an embedding size of \verb|2245| would have had the following configuration:
 \verb|8982 -> 4491 -> 2245 -> 4491 -> 8982|, representing the maximum extension of the progression.
 
@@ -111,7 +114,7 @@ returning the following best values:
 \end{itemize}
 
 The trained model had \verb|8982| nodes for the input and output layers - which corresponded to the size of
-the one-hot encoded array - and \verb|561| nodes for the bottleneck layer, with a total of \verb|10069382 (38.41 MB)|
+the one-hot encoded array - and \verb|560| nodes for the bottleneck layer, with a total of \verb|10069382 (38.41 MB)|
 parameters [figure \ref{fig:model_summary}]
 
 \begin{figure}[H]
@@ -153,7 +156,8 @@ and quadratically to store the similarity scores [figure \ref{fig:similarity_sco
 
 Hyperparameter tuning took quite some time, but this drawback was compensated by the fact that training was performed offline
 while the recommendations were cached and served instantly.
-In addition, retraining could be scheduled to cover the new programmes added to the iPlayer catalogue and the unavailable ones being removed.
+In addition, retraining could be scheduled to cover the new programmes added to the iPlayer catalogue and the unavailable ones being removed
+[figures \ref{fig:catalogue_pids_added}, \ref{fig:catalogue_pids_dropped}].
 
 The main weakness was the model's interpretability.
 The autoencoder is a black box by definition, and using embeddings to calculate the similarity just worsened the problem.

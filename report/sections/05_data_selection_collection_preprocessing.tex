@@ -13,7 +13,8 @@ A programme of the BBC iPlayer catalogue is mapped internally by a hierarchy of 
 An item can be of type \textit{episode}, \textit{series}, or \textit{brand}. The \textit{episode} is the leaf of this tree-like structure,
 representing the playable content like an episode of a series, a live show, or a one-off, like a movie or documentary.
 In contrast, \textit{series} and \textit{brand} types are considered ``containers'' and appear at the upper levels of the tree.
-Their children can be other containers or \textit{episode} items [figure \ref{fig:program_hierarchy}] \cite{BBC:ProgrammePages,BBC:ProgrammeUrlStructure}.
+Their children can be other containers or \textit{episode} items \cite{BBC:ProgrammePages,BBC:ProgrammeUrlStructure},
+[figure \ref{fig:program_hierarchy}] and [figures \ref{fig:pips_brand}, \ref{fig:pips_series}, \ref{fig:pips_brand_series} of the appendix].
 
 \begin{figure}[h]
   \centering
@@ -47,9 +48,9 @@ They represent a tag's name and value and are expressed as URL-formatted strings
   \label{fig:passport_file}
 \end{figure}
 
-The predicate describes the annotation, while the value can be a date or a class of the BBC Ontology \cite{BBC:Ontologies},
-defined as an RDF document \cite{W3C:RDF,W3C:RDF:Concepts}, accessible in Turtle format \cite{W3C:Turtle}
-via the BBC Things API \cite{BBC:Things,BBC:Things:About,BBC:Things:API}.
+The predicate is a class of the BBC Ontologies \cite{BBC:Ontologies} and describes the annotation.
+The value can be a date or a BBC Things entity \cite{BBC:Things,BBC:Things:About} defined as an RDF document \cite{W3C:RDF,W3C:RDF:Concepts},
+described by other BBC Ontology classes and accessible in Turtle format \cite{W3C:Turtle} via the BBC Things API \cite{BBC:Things:API}.
 These entities are linked to each other and other external resources and form a graph data structure.
 
 % Tools used to gather data
