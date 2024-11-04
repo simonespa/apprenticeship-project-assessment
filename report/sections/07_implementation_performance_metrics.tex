@@ -107,19 +107,19 @@ returning the following best values:
 
 \begin{itemize}
   \item \textbf{hidden\_layers:} \verb|1|
-  \item \textbf{embeddings\_size:} \verb|560|
+  \item \textbf{embeddings\_size:} \verb|561|
   \item \textbf{batch\_norm:} \verb|False|
   \item \textbf{dropout:} \verb|True|
   \item \textbf{learning\_rate:} \verb|0.01|
 \end{itemize}
 
 The trained model had \verb|8982| nodes for the input and output layers - which corresponded to the size of
-the one-hot encoded array - and \verb|560| nodes for the bottleneck layer, with a total of \verb|10069382 (38.41 MB)|
+the one-hot encoded array - and \verb|561| nodes for the bottleneck layer, with a total of \verb|10,087,347 (38.48 MB)|
 parameters [figure \ref{fig:model_summary}]
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.5]{model_summary}
+  \includegraphics[scale=0.3]{model_summary}
   \caption{Autoencoder model summary}
   \label{fig:model_summary}
 \end{figure}
@@ -142,7 +142,7 @@ and quadratically to store the similarity scores [figure \ref{fig:similarity_sco
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.26]{embeddings}
+  \includegraphics[scale=0.23]{embeddings}
   \caption{Embeddings dataset}
   \label{fig:embeddings}
 \end{figure}
