@@ -19,12 +19,7 @@ of Content-To-Content similarity recommendations for BBC iPlayer.
 a tolerance of 10% [4500, 5500] is allowed. Appendices, references, diagrams and tables will not be included in
 this total.
 
-Word Count:
-- 5265 (title page, section headings and figure captions)
-- 5183 (title page, section headings, no figure captions)
-- 5163 (section headings only)
-
-"\usepackage[none]{hyphenat}"
+Word Count: 5199
 
 The format of the project report should be:
 
