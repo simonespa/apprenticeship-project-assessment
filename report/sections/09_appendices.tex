@@ -302,35 +302,39 @@
 \end{lstlisting}
 
 \begin{lstlisting}[caption={Binary cross-entropy loss visualisation},label={lst:loss_visualisation}]
-  val_loss = history.history['val_loss']
-  best_epoch = val_loss.index(min(val_loss)) + 1
-  print(f'Best epoch: {best_epoch}')
-
   import matplotlib.pyplot as plt
+  import seaborn as sns
 
-  plt.plot(history.history['loss'], label='Training')
-  plt.plot(history.history['val_loss'], label='Validation')
-  plt.ylabel('Binary Cross Entropy Loss')
+  def get_x(metric):
+    return range(len(history.history[metric]))
+
+  def get_y(metric):
+    return history.history[metric]
+
+  sns.lineplot(
+    history.history,
+    x=get_x('loss'),
+    y=get_y('loss'),
+    label='Training'
+  );
+  sns.lineplot(
+    history.history,
+    x=get_x('val_loss'),
+    y=get_y('val_loss'),
+    label='Validation'
+  );
   plt.xlabel('Epochs')
-  plt.ylim((0, 0.003))
-  plt.legend()
-  plt.show();
+  plt.ylabel('Loss')
+  plt.title('Binary cross-entropy loss')
+  plt.ylim(0, 0.0020)
 \end{lstlisting}
 
 \subsubsection{Embeddings}
 
 \begin{lstlisting}[caption={Embeddings generation},label={lst:embeddings}]
-  from tensorflow.keras import Model
-
-  # Defines Input/Output of the model
-  input = autoencoder.input
-  output = autoencoder.get_layer(name='code').output
-
-  # Defines the embedding generator model using the encoder part of the trained Autoencoder model
-  embedding_generator = Model(name='Embedding_Generator', inputs=input, outputs=output)
-
-  # Generates the embeddings by using the output of the bottleneck layer
-  embeddings = embedding_generator.predict(data)
+  embeddings = autoencoder.get_layer('code')(data)
+  embeddings_df = pd.DataFrame(embeddings, index=data.index)
+  embeddings_df.to_parquet(f'{model_name}.parquet', engine='pyarrow', compression='brotli')
 \end{lstlisting}
 
 \subsubsection{Recommendations}
@@ -341,10 +345,10 @@
 
   # Loads the catalogue
   catalogue = pd.read_parquet('catalogue.parquet')
-  # Gets the PIDs of the programmes to recommend (Top-Level Editorial Objects)
+  # Gets the programmes PIDs (Top-Level Editorial Objects)
   tleo = catalogue.tleo_pid.values
   # Loads the embeddings
-  embeddings = pd.read_parquet('560_1_relu.parquet')
+  embeddings = pd.read_parquet(f'{model_name}.parquet')
   # Gets the TLEOs embeddings
   tleo_embeddings = embeddings[embeddings.index.isin(tleo)]
   # Generates the similarity matrix
