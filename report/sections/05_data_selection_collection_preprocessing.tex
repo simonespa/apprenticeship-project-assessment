@@ -7,28 +7,6 @@
 
 \section{Data selection, collection and pre-processing}
 
-% Data architecture
-
-A programme of the BBC iPlayer catalogue is mapped internally by a hierarchy of items defined by an ID called \textit{PID}.
-An item can be of type \textit{episode}, \textit{series}, or \textit{brand}. The \textit{episode} is the leaf of this tree-like structure,
-representing the playable content like an episode of a series, a live show, or a one-off, like a movie or documentary.
-In contrast, \textit{series} and \textit{brand} types are considered ``containers'' and appear at the upper levels of the tree.
-Their children can be other containers or \textit{episode} items \cite{BBC:ProgrammePages,BBC:ProgrammeUrlStructure},
-[figure \ref{fig:program_hierarchy}] and [figures \ref{fig:pips_brand}, \ref{fig:pips_series}, \ref{fig:pips_brand_series} of the appendix].
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[scale=0.2]{program_hierarchy}
-  \caption{Internal programme hierarchy structure}
-  \label{fig:program_hierarchy}
-\end{figure}
-
-Each item of this tree-like structure represents a part of the programme
-(a single episode, a season, or the programme itself)
-and shares the same Passport tags by inheritance.
-These items are the dataset's rows, replicating the same set of tags for any given programme.
-This duplication was used as a data augmentation training technique to increase the model's performance.
-
 BBC News and Sport articles, iPlayer videos, and Sounds audios are annotated with Passport tags.
 These tags describe any BBC content and can be used for retrieval (search) and filtering (recommendations).
 They can be applied manually by an editorial team with domain knowledge
@@ -39,7 +17,7 @@ This self-service delivery platform exposes data as a document stream for produc
 It provides different types of consumers, such as REST API, AWS S3 bucket, etc.
 Passport documents are JSON objects that contain a property called ``\verb|taggings|'', an array of objects representing the
 metadata annotations. Two properties describe these objects: ``\verb|predicate|'' and ``\verb|value|''.
-They represent a tag's name and value and are expressed as URL-formatted strings, except for dates [figure \ref{fig:passport_file}].
+They represent a tag's name and value are expressed as URL-formatted strings, except for dates [figure \ref{fig:passport_file}].
 
 \begin{figure}[h]
   \centering
@@ -79,9 +57,30 @@ The eight annotations I selected for training were:
 \ref{fig:tag_editorialTone}, \ref{fig:tag_format}, \ref{fig:tag_genre}, \ref{fig:tag_motivation}
 \ref{fig:tag_narrativeTheme} and \ref{fig:tag_relevantTo} for example values).
 
-% Data preprocessing, errors, bias
+% Data architecture
 
-The dataset used for training contained all the programmes available in the iPlayer catalogue from \verb|13 June 2023| to \verb|15 April 2024|.
+A programme of the BBC iPlayer catalogue is mapped internally by a hierarchy of items defined by an ID called \textit{PID}.
+An item can be of type \textit{episode}, \textit{series}, or \textit{brand}. The \textit{episode} is the leaf of this tree-like structure,
+representing the playable content like an episode of a series, a live show, or a one-off, like a movie or documentary.
+In contrast, \textit{series} and \textit{brand} types are considered ``containers'' and appear at the upper levels of the tree.
+Their children can be other containers or \textit{episode} items \cite{BBC:ProgrammePages,BBC:ProgrammeUrlStructure},
+[figure \ref{fig:program_hierarchy}] and [figures \ref{fig:pips_brand}, \ref{fig:pips_series}, \ref{fig:pips_brand_series} of the appendix].
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.2]{program_hierarchy}
+  \caption{Internal programme hierarchy structure}
+  \label{fig:program_hierarchy}
+\end{figure}
+
+Each item of this tree-like structure represents a part of the programme
+(a single episode, a season, or the programme itself)
+and shares the same Passport tags by inheritance.
+These items are the dataset's rows, replicating the same set of tags for any given programme.
+This duplication was used as a data augmentation training technique to increase the model's performance.
+
+The dataset used for training contained the tags of all the episode and container items composing the programmes that were available
+in the iPlayer catalogue from \verb|13 June 2023| to \verb|15 April 2024|.
 The catalogue had \verb|83098| items, \verb|81311| of which were annotated with Passport tags stored in JSON files, amounting to a coverage of \verb|97.85%|.
 The pipeline's pre-processing stage loaded these files [figure \ref{fig:passport_file}] into a dictionary data structure [code \ref{lst:data_loading}].
 The dictionary's key was the \textit{PID} and the value was another dictionary describing the annotations [figure \ref{fig:dataset}].
@@ -126,6 +125,8 @@ speeding up the data loading stage because it did not need to fetch the labels f
   \caption{A list of hashed values for a given tag}
   \label{fig:dataset_column}
 \end{figure}
+
+% Data preprocessing, errors, bias
 
 A source of bias in the dataset was the \verb|mentions| tag.
 This annotation type is automatically generated by an algorithm that extracts terms deemed important,
