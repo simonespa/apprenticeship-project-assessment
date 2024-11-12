@@ -7,19 +7,17 @@
 
 \subsection{Data pre-processing}
 
-I used \textbf{one-hot encoding} to transform the categorical features (i.e. the metadata annotations) into a numerical vector.
-It is a simple yet effective encoding method and is perfect for transforming nominal categoricals because it does not introduce
+I used \textbf{one-hot encoding} to transform the categorical features (i.e., the metadata annotations) into a numerical vector.
+This simple yet effective encoding method is perfect for transforming nominal categoricals because it does not introduce
 any ranking or arithmetic relationship among the encoded values.
-The downside of this approach is that it generates high-dimensional sparse arrays,
-introducing the so-called \textit{curse of dimensionality} problem.
-Nonetheless, this curse became a blessing for the adopted modelling technique,
-which needed high-dimensional data to produce quality results.
+The downside of this approach was that it generates high-dimensional sparse arrays,
+introducing the so-called \textit{curse of dimensionality}, an issue handled by the chosen deep-learning modelling technique.
 
 \subsection{Modelling and regularisation}
 
 I used a \textbf{neural network} to compress the high-dimensional one-hot encoded vectors to a lower-dimensional embedding representation.
 This technique captured non-linearity by learning the underlying latent structure of the data,
-which was vital to representing the original Passport tags in a geometrical space,
+which was essential to represent the original Passport tags in a geometrical space,
 exploiting local proximity as a similarity measure.
 
 I used \textbf{hyperparameter tuning} to find the best model parameters
