@@ -73,40 +73,36 @@ Their children can be other containers or \textit{episode} items \cite{BBC:Progr
   \label{fig:program_hierarchy}
 \end{figure}
 
-Each item of this tree-like structure represents a part of the programme
-(a single episode, a season, or the programme itself)
-and shares the same Passport tags by inheritance.
-These items are the dataset's rows, replicating the same set of tags for any given programme.
-This duplication was used as a data augmentation training technique to increase the model's performance.
+The dataset used for training contained the encoded tags of the episode and container items composing the \verb|5934| programmes
+that were available in the iPlayer catalogue from \verb|13 June 2023| to \verb|15 April 2024|.
+Of the \verb|83098| items, \verb|81311| were annotated with Passport tags stored in JSON files, amounting to a coverage of \verb|97.85%|.
+Because each item of this tree-like structure represents a part of the programme (a single episode, a season, or the programme itself)
+and shares the Passport tags by inheritance,
+some of the dataset rows had similar or duplicate encoded tags belonging to the episodes of the same programme.
+This information redundancy worked as a data augmentation training technique to improve the model's performance,
+considering the small size of the catalogue compared to the \verb|8982| one-hot encoded features.
 
-The dataset used for training contained the tags of all the episode and container items composing the programmes that were available
-in the iPlayer catalogue from \verb|13 June 2023| to \verb|15 April 2024|.
-The catalogue had \verb|83098| items, \verb|81311| of which were annotated with Passport tags stored in JSON files, amounting to a coverage of \verb|97.85%|.
 The pipeline's pre-processing stage loaded these files [figure \ref{fig:passport_file}] into a dictionary data structure [code \ref{lst:data_loading}].
 The dictionary's key was the \textit{PID} and the value was another dictionary describing the annotations [figure \ref{fig:dataset}].
-
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.3]{dataset}
   \caption{A DataFrame visualisation of the dictionary data structure}
   \label{fig:dataset}
 \end{figure}
-
 A programme can be tagged with the same predicate multiple times [figure \ref{fig:dataset_row}] if it has different values,
 while the same value (e.g. ``Music'') can be used by various predicates (e.g. \verb|about| or \verb|genre|).
-
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.5]{dataset_row}
   \caption{A sample programme with tagging}
   \label{fig:dataset_row}
 \end{figure}
-
 The pipeline then created a Pandas \textit{Dataframe} pre-populated with zeros,
 where the rows represented the programmes, and the columns represented the tags.
 I used a MultiIndex \cite{Pandas:MultiIndex} for the columns because it needed to keep track of the duplicate values (2nd-level index)
 across the predicates (1st-level index) to access the cells to populate them with the value ``\verb|1|''
-if the programme was annotated with the corresponding tag, generating one-hot encoded arrays [figure \ref{fig:dataset_encoded}] [code \ref{lst:data_encoding}].
+if the programme was annotated with the corresponding tag, generating one-hot encoded array of size \verb|8982| [figure \ref{fig:dataset_encoded}] [code \ref{lst:data_encoding}].
 
 \begin{figure}[h]
   \centering
@@ -145,6 +141,5 @@ unseen tags leads to unpredictable errors.
 The encoding is positional, and the combination of \verb|1| and \verb|0| learned by the model
 belongs to the tags seen during training. So, I decided to drop the new tags and encode only the ones the model was trained on
 while padding the rest with zeros, pending retraining to capture the new information.
-Also, some programmes did not have any annotations entirely. Adding them to the training data, created a group of entries with all zeros.
-If enough observations shared this uninformative characteristic, the model could have picked it up.
-I decided to drop these programmes and include only the ones with at least one annotation.
+Some programmes did not have any annotations, producing an encoding of all zeros,
+so I dropped them and included only the ones with at least one annotation.
