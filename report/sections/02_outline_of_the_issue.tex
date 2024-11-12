@@ -9,7 +9,7 @@ One of the top priorities for the BBC is to increase the usage across the busine
 an internal BBC system that provides a rich set of metadata annotations for multimodal content (audio, video and text).
 The usage in production is low, and its BBC-wide adoption would make access to metadata consistent, remove duplications, and reduce effort and costs.
 
-In addition, the current C2C solution is suboptimal and limits the quality of the generated item embeddings.
+In addition, the current content similarity calculation uses a suboptimal approach, which limits the quality of the recommendations.
 The similarity score is directly proportional to the number of values in common between any pairs of items
 on a per-feature basis. However, the commonality is calculated with exact string equality,
 ignoring any relationship between different categorical values expressing a similar concept (e.g. ``comedy'' and ``stand-up comedy'').
@@ -20,9 +20,8 @@ but it does not solve the polarising effect of a skewed distribution.
 Unfortunately, because these are hyperparameters and not learned weights,
 the model cannot improve the performance by minimising them against a cost function.
 \\ \\
-I identified three main opportunities for improvement that can help the BBC meet its goals:
-enhancing the quality of recommendations, reducing costs, and accelerating innovation,
-thus increasing the licence fee value for money. These opportunities are:
+This project could help the BBC enhance the quality of recommendations while reducing costs and accelerating innovation,
+thus increasing the licence fee value for money. Its contribution could:
 
 \begin{itemize}
   \item \textbf{Improve the quality of the content similarity recommendations}.
