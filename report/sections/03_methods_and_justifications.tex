@@ -7,10 +7,10 @@
 
 \subsection{Data pre-processing}
 
-I used \textbf{one-hot encoding} to transform the categorical features (i.e., the metadata annotations) into a numerical vector.
+I used \textbf{one-hot encoding} to transform the categorical features (i.e., the metadata annotations) into numerical vectors.
 This simple yet effective encoding method is perfect for transforming nominal categoricals because it does not introduce
 any ranking or arithmetic relationship among the encoded values.
-The downside of this approach was that it generates high-dimensional sparse arrays,
+The downside of this approach was that it generated high-dimensional sparse arrays,
 introducing the so-called \textit{curse of dimensionality}, an issue handled by the chosen deep-learning modelling technique.
 
 \subsection{Modelling and regularisation}
@@ -47,9 +47,9 @@ and this is only possible if the angle $\theta$ of any vector pair is a number b
 \subsection{Tools and frameworks}
 
 The entire project was written in \textbf{Python}.
-It is the \textit{de facto} programming language for data science and machine learning tasks.
-Python has an established, diverse, and well-documented ecosystem of external libraries and frameworks that facilitate the job,
-and it is also the language of choice at the BBC.
+It has an established, diverse, and well-documented ecosystem of external libraries and frameworks that facilitate the job.
+It is the \textit{de facto} programming language for data science and machine learning tasks,
+and it is also the language of choice at the BBC for the same reasons.
 
 I used \textbf{Pandas} only for tabular data manipulation to generate and store the one-hot encoded vectors.
 Unfortunately, using it for exploratory data analysis (EDA) was impossible
