@@ -33,8 +33,6 @@ and \textbf{data augmentation}, by including in the training data the episodes t
 \subsection{Content similarity}
 
 I used the \textbf{cosine} of the angle $\theta$ between each pair of embeddings to calculate the similarity scores.
-This metric is insensitive to the magnitude of the vectors, and because high-frequency values tend to have larger magnitudes,
-it mitigates the impact on recommendations of commonly used tags.
 
 One-hot encoded vectors lack meaningful relations between them.
 They represent unit vectors bound in the ``positive quadrant'' of a Cartesian coordinate system for a multidimensional Euclidean space.
