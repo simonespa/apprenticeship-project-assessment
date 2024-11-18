@@ -36,8 +36,8 @@ to allow the network to minimise the reconstruction error, pushing the values of
 The minimisation of the reconstruction error was the reason for using \textit{binary cross-entropy} as the performance metric.
 I did not use the \textit{SoftMax} activation function for the output layer because every node needed to be able to assume those values.
 I did not use any residual-based loss function either because the penalty for wrong predictions
-(i.e., when the X-axis value is close to zero) is not as significant as for the binary cross-entropy loss.
-Because the slope of the derivative in this region is not steep enough, it also affects the step size during backpropagation [figure \ref{fig:loss_comparison}].
+(i.e., when the X-axis value is close to zero) is not as significant as for the binary cross-entropy loss [figure \ref{fig:loss_comparison}].
+Because the slope of the derivative in this region is not steep enough [figure \ref{fig:loss_comparison_tangent}], it also affects the gradient speed during backpropagation.
 The negative log loss was the best option because it heavily penalised significant differences between $y$ and $\hat{y}$,
 with a natural logarithmic progression.
 
@@ -46,6 +46,13 @@ with a natural logarithmic progression.
   \includegraphics[scale=0.3]{loss_comparison}
   \caption{Comparison between Binary Cross-Entropy and Square Residuals loss functions}
   \label{fig:loss_comparison}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.4]{loss_comparison_tangent}
+  \caption{Comparison between Binary Cross-Entropy and Square Residuals loss functions with slopes}
+  \label{fig:loss_comparison_tangent}
 \end{figure}
 
 I used the \textit{Rectified Linear Unit (ReLU)} as an activation function for the hidden layers
