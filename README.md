@@ -78,9 +78,12 @@ assessor based on the presentation, however an EPAO question bank must be provid
 assessor to use as a guide.
 
 ## Dates
-- Start date: 23/09/2024
-- Completion date: 04/11/2024
-- Submission date: 18/11/2024
+- **EPA Start date: 23/09/2024**
+- Assessment Method 2, Professional Discussion: 21/10/2024 - 9:00 AM to 10:30 AM
+- Project Completion date: 04/11/2024
+- Project & Presentation Submission date: 18/11/2024
+- Assessment Method 1, Project Report with Presentation: 06/12/2024 - 9:00 AM to 11:00 AM
+- **EPA End date: 30/03/2025**
 
 ## References
 - [AI Apprenticeship Standard](https://www.instituteforapprenticeships.org/media/3685/st0763_artificial-intelligence-ai-data-specialist_l7_ap-for-publication_qm.pdf)
